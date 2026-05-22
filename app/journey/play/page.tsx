@@ -1,139 +1,254 @@
-"use client";
+﻿"use client";
 
-import { useState } from "react";
-import { Button, ButtonLink } from "../../components/Button";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
+import { CardArtwork } from "../../components/CardArtwork";
+import { useCardDrafts } from "../../components/useCardDrafts";
+import { HydrationGate, useRunGuard } from "../../components/GameGuards";
+import { useGame } from "../../components/GameProvider";
 import { ProgressBar } from "../../components/ProgressBar";
-import { candidateCards, currentEvent, dimensions, featureCards, skillCards } from "../../data/game";
+import { dimensionMeta, skillCards } from "../../data/game";
+import { dimensionLabelMap, getCurrentEvent, getFeatureById, getPlanetById, isRecommendedForChoice } from "../../lib/game-engine";
+import type { FeatureCard } from "../../lib/game-types";
 
 export default function JourneyPlayPage() {
-  const [selectedChoice, setSelectedChoice] = useState(0);
-  const [selectedFeature, setSelectedFeature] = useState(0);
-  const [selectedCandidate, setSelectedCandidate] = useState(0);
-  const [drawOpen, setDrawOpen] = useState(false);
+  const router = useRouter();
+  const runState = useRunGuard(["play"]);
+  const { selectChoice, selectFeature, openCandidates, pickCandidate, resolvePlay, useSkill: activateSkill } = useGame();
+  const { getDraft } = useCardDrafts();
   const [toast, setToast] = useState("");
 
-  function triggerSkill(name: string) {
-    setToast(`${name} 技能发动`);
-    window.setTimeout(() => setToast(""), 1100);
+  const run = runState.currentRun;
+  const event = run ? getCurrentEvent(run) : null;
+  const planet = run ? getPlanetById(run.config.planetId) : null;
+
+  useEffect(() => {
+    if (!run) {
+      return;
+    }
+    if (run.stage === "challenge") {
+      router.replace("/journey/challenge");
+    } else if (run.stage === "jump") {
+      router.replace("/journey/jump");
+    }
+  }, [router, run]);
+
+  useEffect(() => {
+    if (!toast) {
+      return;
+    }
+    const timer = window.setTimeout(() => setToast(""), 1200);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+
+  const handCards = useMemo(() => (run ? run.hand.map((cardId) => getFeatureById(cardId)) : []), [run]);
+  const candidateCards = useMemo(() => (run ? run.currentCandidates.map((cardId) => getFeatureById(cardId)) : []), [run]);
+
+  function getDisplayCard(card: FeatureCard) {
+    const draft = getDraft(card.id);
+    return {
+      artwork: draft?.artwork ?? null,
+      capability: draft?.capability ?? card.capability,
+      name: draft?.name ?? card.name,
+      summary: draft?.description ?? card.summary,
+      effects: draft
+        ? {
+            ...card.effects,
+            safety: draft.scores.safety,
+            comfort: draft.scores.comfort,
+            intelligence: draft.scores.intelligence,
+          }
+        : card.effects,
+    };
+  }
+
+  if (!run || !event || !planet) {
+    return (
+      <HydrationGate>
+        <main className="app-page">
+          <section className="game-card empty-state-card">
+            <p className="game-label">Journey</p>
+            <h1>���ڻָ��ó̡�</h1>
+          </section>
+        </main>
+      </HydrationGate>
+    );
+  }
+
+  const selectedChoice = event.choices.find((choice) => choice.id === run.selectedChoiceId) ?? event.choices[0];
+  const selectedFeature = getDisplayCard(getFeatureById(run.selectedFeatureId));
+
+  function handleSkill(skillId: (typeof skillCards)[number]["id"]) {
+    const result = activateSkill(skillId);
+    setToast(result.message);
+  }
+
+  function handleConfirmPlay() {
+    if (!run) {
+      return;
+    }
+    const completedStep = run.currentMainIndex + 1;
+    const nextRoute =
+      completedStep >= run.eventDeck.length ? "/result/reveal" : run.config.minorPlanetSlots.includes(completedStep) ? "/journey/challenge" : "/journey/jump";
+    const result = resolvePlay();
+    if (!result.ok) {
+      setToast(result.message);
+      return;
+    }
+    router.push(nextRoute);
   }
 
   return (
-    <main className="game-page">
-      <header className="status-layer">
-        <div className="dimension-strip">
-          {dimensions.map((dimension) => (
-            <ProgressBar key={dimension.name} label={`${dimension.name} ${dimension.score}`} value={dimension.value} />
-          ))}
-        </div>
-        <div className="stage-status">
-          <strong>主星球 2 / 5</strong>
-          <span>阶段：打出功能卡</span>
-          <span>胜利星 ★★★</span>
-        </div>
-      </header>
-
-      <section className="journey-stage" aria-label="旅途主舞台">
-        <div className="stage-map">
-          <span className="stage-dot passed" />
-          <span className="stage-dot passed" />
-          <span className="stage-dot current" />
-          <span className="stage-dot" />
-          <span className="stage-dot" />
-        </div>
-        <span className="drawn-ship stage-ship" />
-        <Card as="article" className="event-card">
-          <p className="game-label">{currentEvent.type}</p>
-          <h1>
-            <span>复杂天气下，</span>
-            <span>你要完成一次临时接送</span>
-          </h1>
-          <p>{currentEvent.copy}</p>
-          <div className="choice-row">
-            {currentEvent.choices.map((choice, index) => (
-              <button className={`choice-card ${selectedChoice === index ? "is-selected" : ""}`} key={choice} onClick={() => setSelectedChoice(index)} type="button">
-                {choice}
-              </button>
+    <HydrationGate>
+      <main className="game-page">
+        <header className="status-layer">
+          <div className="dimension-strip">
+            {dimensionMeta.map((dimension) => (
+              <ProgressBar
+                key={dimension.key}
+                label={`${dimension.label} ${run.dimensions[dimension.key]}`}
+                value={run.dimensions[dimension.key]}
+              />
             ))}
           </div>
-        </Card>
-      </section>
+          <div className="stage-status">
+            <strong>
+              ������ {Math.min(run.currentMainIndex + 1, run.eventDeck.length)} / {run.eventDeck.length}
+            </strong>
+            <span>��������{planet.name}</span>
+            <span>���ռ�ʤ���ǣ�{run.earnedStars.length} ��</span>
+          </div>
+        </header>
 
-      <footer className="action-layer">
-        <section className="skill-zone" aria-label="技能卡区">
-          <span className="zone-title">技能卡</span>
-          {skillCards.map((skill) => (
-            <button className="skill-card" key={skill.name} onClick={() => triggerSkill(skill.name)} type="button" title={skill.use}>
-              <strong>{skill.name}</strong>
-              <small>{skill.use}</small>
-            </button>
-          ))}
-          <span className="usage-count">本场 1 / 3</span>
-        </section>
-
-        <section className="hand-zone" aria-label="当前手牌区">
-          {featureCards.map((card, index) => (
-            <button
-              className={`feature-card ${card.recommended ? "is-recommended" : ""} ${selectedFeature === index ? "is-selected" : ""}`}
-              key={card.title}
-              onClick={() => setSelectedFeature(index)}
-              type="button"
-            >
-              <span>{card.label}</span>
-              <strong>{card.title}</strong>
-              <small>{card.score}</small>
-            </button>
-          ))}
-        </section>
-
-        <div className="confirm-strip">
-          <Button variant="secondary" onClick={() => setDrawOpen(true)}>
-            主动补牌
-          </Button>
-          <span>已选：{featureCards[selectedFeature].title}</span>
-          <ButtonLink href="/journey/challenge">确认出牌</ButtonLink>
-        </div>
-      </footer>
-
-      <div
-        aria-hidden={!drawOpen}
-        className={`modal-backdrop ${drawOpen ? "is-open" : ""}`}
-        onClick={(event) => {
-          if (event.target === event.currentTarget) {
-            setDrawOpen(false);
-          }
-        }}
-      >
-        <section aria-labelledby="draw-title" aria-modal="true" className="draw-modal" role="dialog">
-          <h2 id="draw-title">选择一张支援卡</h2>
-          <p>这张卡将加入牌组，并作为本次行动打出。</p>
-          <div className="candidate-row">
-            {candidateCards.map((card, index) => (
-              <button
-                className={`feature-card ${selectedCandidate === index ? "is-selected" : ""}`}
-                key={card.title}
-                onClick={() => setSelectedCandidate(index)}
-                type="button"
-              >
-                <span>{card.label}</span>
-                <strong>{card.title}</strong>
-                <small>{card.score}</small>
-              </button>
+        <section className="journey-stage" aria-label="�ó�����̨">
+          <div className="stage-map">
+            {run.eventDeck.map((eventId, index) => (
+              <span className={`stage-dot ${index < run.currentMainIndex ? "passed" : ""} ${index === run.currentMainIndex ? "current" : ""}`} key={eventId} />
             ))}
           </div>
+          <span className="drawn-ship stage-ship" />
+          <Card as="article" className="event-card">
+            <p className="game-label">
+              {planet.name} �� {event.planetName}
+            </p>
+            <h1>
+              <span>{event.title}</span>
+            </h1>
+            <p>{event.description}</p>
+            <div className="choice-row">
+              {event.choices.map((choice) => (
+                <button
+                  className={`choice-card ${selectedChoice.id === choice.id ? "is-selected" : ""}`}
+                  key={choice.id}
+                  onClick={() => selectChoice(choice.id)}
+                  type="button"
+                >
+                  {choice.label}
+                </button>
+              ))}
+            </div>
+            <p className="hint">{selectedChoice.description}</p>
+          </Card>
+        </section>
+
+        <footer className="action-layer">
+          <section className="skill-zone" aria-label="���ܿ���">
+            <span className="zone-title">���ܿ�</span>
+            {skillCards.map((skill) => {
+              const usedCount = run.skillUses[skill.id];
+              const disabled = usedCount >= skill.maxUses;
+              return (
+                <button className="skill-card" disabled={disabled} key={skill.id} onClick={() => handleSkill(skill.id)} type="button" title={skill.summary}>
+                  <strong>{skill.name}</strong>
+                  <small>{skill.summary}</small>
+                  <small>{disabled ? "��������" : `ʣ�� ${skill.maxUses - usedCount} ��`}</small>
+                </button>
+              );
+            })}
+          </section>
+
+          <section className="hand-zone" aria-label="��ǰ������">
+            {handCards.map((card) => {
+              const displayCard = getDisplayCard(card);
+              return (
+                <button
+                  className={`feature-card ${isRecommendedForChoice(card.id, event.id, selectedChoice.id) ? "is-recommended" : ""} ${
+                    run.selectedFeatureId === card.id ? "is-selected" : ""
+                  }`}
+                  key={card.id}
+                  onClick={() => selectFeature(card.id)}
+                  type="button"
+                >
+                  <CardArtwork alt={`${displayCard.name} ����ͼ��`} src={displayCard.artwork} />
+                  <span>{displayCard.capability}</span>
+                  <strong>{displayCard.name}</strong>
+                  <small>{displayCard.summary}</small>
+                  <small>
+                    {Object.entries(displayCard.effects)
+                      .map(([key, value]) => `${dimensionLabelMap[key as keyof typeof dimensionLabelMap]} ${value! > 0 ? "+" : ""}${value}`)
+                      .join(" �� ")}
+                  </small>
+                </button>
+              );
+            })}
+          </section>
+
           <div className="confirm-strip">
-            <Button variant="secondary" onClick={() => setDrawOpen(false)}>
-              返回
+            <Button
+              onClick={() => {
+                if (run.manualDrawUsed) {
+                  setToast("���غ��Ѿ������������ˡ�");
+                  return;
+                }
+                openCandidates("manual-draw");
+              }}
+              variant="secondary"
+            >
+              {run.manualDrawUsed ? "���غ��Ѳ���" : "��������"}
             </Button>
-            <span>当前选择：{candidateCards[selectedCandidate].title}</span>
-            <Button onClick={() => setDrawOpen(false)}>确认选择</Button>
+            <span>
+              ��ѡ����{selectedChoice.label} / ��ѡ���ܿ���{selectedFeature.name}
+              {run.duplicateCardId === run.selectedFeatureId ? " / ���غ�Ч������" : ""}
+            </span>
+            <Button onClick={handleConfirmPlay}>ȷ�ϳ���</Button>
           </div>
-        </section>
-      </div>
+        </footer>
 
-      <div aria-live="polite" className={`skill-toast ${toast ? "is-visible" : ""}`}>
-        {toast || "技能卡发动"}
-      </div>
-    </main>
+        <div
+          aria-hidden={candidateCards.length === 0}
+          className={`modal-backdrop ${candidateCards.length > 0 ? "is-open" : ""}`}
+          onClick={(eventTarget) => {
+            if (eventTarget.target === eventTarget.currentTarget) {
+              setToast("��ѡ��һ�ź�ѡ���������ơ�");
+            }
+          }}
+        >
+          <section aria-labelledby="draw-title" aria-modal="true" className="draw-modal" role="dialog">
+            <h2 id="draw-title">{run.candidateSource === "skill-draw" ? "���ܲ��ƣ�ѡ�� 1 �ż�������" : "�������ƣ�ѡ�� 1 �ż�������"}</h2>
+            <p>��Щ��ѡ��������㱾�غϵĿ��÷�����ѡ�����Զ���Ϊ��ǰ��ѡ���ܿ���</p>
+            <div className="candidate-row">
+              {candidateCards.map((card) => {
+                const displayCard = getDisplayCard(card);
+                return (
+                  <button className="feature-card" key={card.id} onClick={() => pickCandidate(card.id)} type="button">
+                    <CardArtwork alt={`${displayCard.name} ����ͼ��`} src={displayCard.artwork} />
+                    <span>{displayCard.capability}</span>
+                    <strong>{displayCard.name}</strong>
+                    <small>{displayCard.summary}</small>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        </div>
+
+        <div aria-live="polite" className={`skill-toast ${toast ? "is-visible" : ""}`}>
+          {toast || "�����ɹ�"}
+        </div>
+      </main>
+    </HydrationGate>
   );
 }
+

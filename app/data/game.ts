@@ -1,130 +1,638 @@
-export type PlanetTheme = {
-  name: string;
-  theme: string;
-  className: string;
-  desc: string;
-  colorAdvice: string;
-};
+﻿import planetArcImage from "../../pub_pic/1.png";
+import planetDawnImage from "../../pub_pic/2.png";
+import planetAuroraImage from "../../pub_pic/3.png";
+import planetHaloImage from "../../pub_pic/4.png";
+import planetRailImage from "../../pub_pic/5.png";
+import type {
+  ComboPack,
+  DimensionKey,
+  DimensionScores,
+  EventCard,
+  FeatureCard,
+  MinorPlanetChallenge,
+  PlanetTheme,
+  SkillCard,
+} from "../lib/game-types";
 
-export type DimensionScore = {
-  name: string;
-  value: number;
-  score: number;
-};
+export const dimensionMeta: Array<{ key: DimensionKey; label: string }> = [
+  { key: "safety", label: "��ȫ" },
+  { key: "convenience", label: "���" },
+  { key: "comfort", label: "����" },
+  { key: "family", label: "��ͥ" },
+  { key: "style", label: "����" },
+  { key: "intelligence", label: "����" },
+];
 
-export type FeatureCard = {
-  label: string;
-  title: string;
-  score: string;
-  recommended?: boolean;
+export const baseDimensions: DimensionScores = {
+  safety: 50,
+  convenience: 50,
+  comfort: 50,
+  family: 50,
+  style: 50,
+  intelligence: 50,
 };
-
-export type EventCard = {
-  type: string;
-  title: string;
-  copy: string;
-  choices: string[];
-};
-
-export type SkillCard = {
-  name: string;
-  use: string;
-};
-
-export type JourneyStep = {
-  planet: string;
-  action: string;
-  feature: string;
-};
-
-export type ResultView = "user" | "sales";
 
 export const planets: PlanetTheme[] = [
-  { name: "蓝弧星", theme: "冷静线稿", className: "planet-arc", desc: "理性、冷静、未来感", colorAdvice: "银灰、深蓝、冷白" },
-  { name: "霞光星", theme: "柔和手绘", className: "planet-dawn", desc: "温暖、陪伴、生活感", colorAdvice: "暖白、浅灰、珊瑚点缀" },
-  { name: "极光星", theme: "探索轨迹", className: "planet-aurora", desc: "清爽、智能、探索感", colorAdvice: "石墨灰、雾白、浅绿点缀" },
-  { name: "晨曦星", theme: "仪式刻线", className: "planet-morning", desc: "舒适、尊贵、仪式感", colorAdvice: "象牙白、炭黑、金属灰" },
-  { name: "银轨星", theme: "机械轨道", className: "planet-rail", desc: "机械、精准、秩序感", colorAdvice: "银灰、黑白、冷金属" },
+  {
+    id: "arc",
+    name: "������",
+    title: "�侲�߿�",
+    description: "ƫ���ȶ���Ч�ʺ���ȷ�������ó���㡣",
+    colorAdvice: "���ҡ��������׵��",
+    accentClass: "planet-arc",
+    imageSrc: planetArcImage,
+  },
+  {
+    id: "dawn",
+    name: "������",
+    title: "����ּ�",
+    description: "�������ճ���顢���ɷ�Χ���ͥ�Ѻá�",
+    colorAdvice: "ů�ס�ɰ�𡢵�ɺ��",
+    accentClass: "planet-dawn",
+    imageSrc: planetDawnImage,
+  },
+  {
+    id: "aurora",
+    name: "������",
+    title: "̽����·",
+    description: "ϲ�����ʹ��ܡ�����������Ƽ������顣",
+    colorAdvice: "��ס�ǳ�̡�ʯī��",
+    accentClass: "planet-aurora",
+    imageSrc: planetAuroraImage,
+  },
+  {
+    id: "halo",
+    name: "�׻���",
+    title: "��ʽ����",
+    description: "�ں��ռ��ʸС���Χ�뱻�չ˵�ϸ�����顣",
+    colorAdvice: "�����ס�ú�ڡ������",
+    accentClass: "planet-halo",
+    imageSrc: planetHaloImage,
+  },
+  {
+    id: "rail",
+    name: "�����",
+    title: "���ܻ�е",
+    description: "�������򡢿ɿ��Ժ�˳�ֵĹ���Э����",
+    colorAdvice: "�ڰ׻ҡ�������������",
+    accentClass: "planet-rail",
+    imageSrc: planetRailImage,
+  },
 ];
-
-export const dimensions: DimensionScore[] = [
-  { name: "安全", value: 76, score: 12 },
-  { name: "便捷", value: 64, score: 8 },
-  { name: "娱乐", value: 42, score: 5 },
-  { name: "家庭", value: 48, score: 6 },
-  { name: "个性", value: 34, score: 3 },
-  { name: "智能", value: 82, score: 10 },
-];
-
-export const currentEvent: EventCard = {
-  type: "事件卡 · 雨夜接人",
-  title: "复杂天气下，你要完成一次临时接送",
-  copy: "道路湿滑、乘客正在等待，你更希望座舱优先帮你稳住安全感，还是减少操作负担？",
-  choices: ["更稳妥", "更省心"],
-};
 
 export const skillCards: SkillCard[] = [
-  { name: "重抽", use: "刷新当前候选" },
-  { name: "补牌", use: "追加一张机会" },
-  { name: "换牌", use: "替换不理想手牌" },
-  { name: "复制牌", use: "复制已有功能卡" },
+  { id: "redraw", name: "�س�", summary: "ˢ�µ�ǰ���ƣ����������غϿ��÷�����", maxUses: 1 },
+  { id: "boost-draw", name: "����", summary: "�����ȡ 5 �ź�ѡ�ƣ����м��� 1 �ŵ����ơ�", maxUses: 1 },
+  { id: "swap", name: "����", summary: "�滻��ǰѡ�е����ƣ���һ���µĹ��ܿ���", maxUses: 1 },
+  { id: "echo", name: "������", summary: "���غϴ���Ĺ��ܿ�Ч������һ�Ρ�", maxUses: 1 },
 ];
 
 export const featureCards: FeatureCard[] = [
-  { label: "建议", title: "智能雨夜辅助", score: "安全 +2 · 智能 +1", recommended: true },
-  { label: "功能", title: "沉浸影音模式", score: "娱乐 +2 · 个性 +1" },
-  { label: "建议", title: "自动泊车联动", score: "便捷 +2 · 智能 +1", recommended: true },
-  { label: "功能", title: "家庭关怀提醒", score: "家庭 +2 · 安全 +1" },
-  { label: "功能", title: "座舱氛围律动", score: "娱乐 +1 · 个性 +2" },
-];
-
-export const candidateCards: FeatureCard[] = [
-  { label: "候选", title: "智能泊车辅助", score: "便捷 +2" },
-  { label: "候选", title: "车内空气净化", score: "家庭 +1" },
-  { label: "候选", title: "语音多轮对话", score: "智能 +2" },
-  { label: "候选", title: "儿童守护模式", score: "家庭 +2" },
-  { label: "候选", title: "氛围灯律动", score: "娱乐 +1" },
-];
-
-export const challengeLines = [
-  { name: "安全", value: 82, label: "达成 · 安全胜利星", achieved: true },
-  { name: "便捷", value: 58, label: "未达成", achieved: false },
-  { name: "娱乐", value: 72, label: "达成 · 娱乐胜利星", achieved: true },
-  { name: "家庭", value: 44, label: "未达成", achieved: false },
-  { name: "个性", value: 52, label: "未达成", achieved: false },
-  { name: "智能", value: 88, label: "达成 · 智能胜利星", achieved: true },
-];
-
-export const journeyReplay: JourneyStep[] = [
-  { planet: "蓝弧星", action: "选择更稳妥", feature: "打出智能雨夜辅助" },
-  { planet: "回声星", action: "通过小星球检测", feature: "获得安全、娱乐、智能胜利星" },
-  { planet: "轨道星", action: "选择减少操作", feature: "打出自动泊车联动" },
-];
-
-export const resultCopy: Record<ResultView, { title: string; copy: string; comboLead: string; advice: string }> = {
-  user: {
-    title: "智能效率型 · 便捷顺滑型",
-    copy: "你更容易被能主动分担操作、提升安全确定性的座舱能力打动。你的驾驶星球偏向冷静、高效、可控。",
-    comboLead: "适合你的座舱组合更像一套可靠副驾驶，会先帮你稳住关键场景，再减少重复操作。",
-    advice: "适合关注中大型智能 SUV 或高阶辅助驾驶配置车型，颜色建议延续冷静线稿主题。",
+  {
+    id: "rain-guard",
+    name: "������ҹ����",
+    summary: "��ʪ������Ұ����ʱ������ס���������ѽ��ࡣ",
+    capability: "������ȫ",
+    tags: ["��ȫ", "��ҹ", "�ȶ�"],
+    effects: { safety: 2, intelligence: 1, comfort: 1 },
+    recommendedFor: ["��ȫ", "��ҹ", "��", "��������"],
   },
-  sales: {
-    title: "高智能与高便捷需求用户 · 安全敏感度较高",
-    copy: "用户需求重心集中在智能辅助、操作减负与安全确定性，可优先推荐高阶辅助驾驶、自动泊车和主动交互能力。",
-    comboLead: "推荐重点应落在语音与交互、设备互联、高阶辅助驾驶和泊车便利能力上。",
-    advice: "导购沟通可先建立安全信任，再展开智能辅助、自动泊车与场景联动的可感知价值。",
+  {
+    id: "auto-park",
+    name: "�Զ���������",
+    summary: "��խλͣ����İ�����ؼ����ظ�����ѹ����",
+    capability: "��������",
+    tags: ["���", "����", "ͣ��"],
+    effects: { convenience: 2, intelligence: 1 },
+    recommendedFor: ["ͣ��", "ʡ��", "��խ", "���"],
   },
-};
-
-export const comboPacks = [
-  { title: "安心巡航包", items: "雨夜辅助 / 盲区提醒 / 车距预警" },
-  { title: "省心泊车包", items: "自动泊车 / 远程召唤 / 记忆路线" },
-  { title: "智能交互包", items: "语音多轮 / 场景联动 / 主动建议" },
+  {
+    id: "family-alert",
+    name: "��ͥ�ػ�����",
+    summary: "���³�����ͯ�����ͳ�;ƣ��ʱ�����º����ѡ�",
+    capability: "��ͥ�ػ�",
+    tags: ["��ͥ", "��ȫ", "�չ�"],
+    effects: { family: 2, safety: 1, comfort: 1 },
+    recommendedFor: ["��ͥ", "�չ�", "��ͯ", "���"],
+  },
+  {
+    id: "cabin-scene",
+    name: "���ճ�������",
+    summary: "���ݳ����Զ��л��ƹ⡢�յ�������Ԥ�衣",
+    capability: "��������",
+    tags: ["����", "����", "����"],
+    effects: { comfort: 2, style: 1, intelligence: 1 },
+    recommendedFor: ["��Χ", "����", "����", "��ʽ��"],
+  },
+  {
+    id: "voice-assistant",
+    name: "��������ܼ�",
+    summary: "���������������ִ�ж������ָ�",
+    capability: "�������",
+    tags: ["����", "���", "����"],
+    effects: { intelligence: 2, convenience: 1 },
+    recommendedFor: ["����", "Ч��", "����", "�ٲ���"],
+  },
+  {
+    id: "surround-audio",
+    name: "����Ӱ��ģʽ",
+    summary: "Ӫ���������ͨ�ں�פ��Ӱ�����顣",
+    capability: "Ӱ������",
+    tags: ["����", "����", "����"],
+    effects: { comfort: 1, style: 2 },
+    recommendedFor: ["����", "��Χ", "����", "��Ϣ"],
+  },
+  {
+    id: "air-purifier",
+    name: "���ڿ�������",
+    summary: "��ӵ�ºͶ��˳��������б��ֳ��ڿ������ʡ�",
+    capability: "��������",
+    tags: ["����", "��ͥ", "����"],
+    effects: { comfort: 2, family: 1 },
+    recommendedFor: ["��ͥ", "����", "��;", "����"],
+  },
+  {
+    id: "road-memory",
+    name: "��Ƶ·�߼���",
+    summary: "�Զ�ʶ��ͨ��·�߲���ǰԤ��ӵ�±仯��",
+    capability: "����Ч��",
+    tags: ["���", "����", "ͨ��"],
+    effects: { convenience: 2, intelligence: 1 },
+    recommendedFor: ["ͨ��", "Ч��", "��·", "ʡʱ"],
+  },
+  {
+    id: "blind-spot",
+    name: "ä��Ԥ����ǿ",
+    summary: "������ᳵ�͸���·���������ܱ߸�֪��ʾ��",
+    capability: "������ȫ",
+    tags: ["��ȫ", "��Ұ", "���"],
+    effects: { safety: 2, intelligence: 1 },
+    recommendedFor: ["��ȫ", "��Ұ", "����·��", "���"],
+  },
+  {
+    id: "remote-call",
+    name: "Զ���ٻ�",
+    summary: "�ڵ��³������խ��λ���ó�������������",
+    capability: "��������",
+    tags: ["���", "ͣ��", "����"],
+    effects: { convenience: 2, intelligence: 1, style: 1 },
+    recommendedFor: ["ͣ��", "���", "�Ƽ���"],
+  },
+  {
+    id: "seat-massage",
+    name: "��ѹ���ΰ�Ħ",
+    summary: "��;ͨ���м���ƣ�ͣ����������������",
+    capability: "��������",
+    tags: ["����", "��ͥ", "����"],
+    effects: { comfort: 2, family: 1 },
+    recommendedFor: ["����", "��;", "����"],
+  },
+  {
+    id: "pet-mode",
+    name: "�����ػ�ģʽ",
+    summary: "��ʱ�복ʱ���ְ�ȫ�¶Ȳ�ͬ������״̬��",
+    capability: "��ͥ�ػ�",
+    tags: ["��ͥ", "��ȫ", "���"],
+    effects: { family: 2, safety: 1, style: 1 },
+    recommendedFor: ["��ͥ", "����", "�ػ�"],
+  },
+  {
+    id: "privacy-mode",
+    name: "˽�����ģʽ",
+    summary: "ѹ��֪ͨ���ţ�רע��ʻ�����ʱ�̡�",
+    capability: "��������",
+    tags: ["����", "����", "����"],
+    effects: { comfort: 1, style: 2, convenience: -1 },
+    recommendedFor: ["����", "����", "��ʽ��"],
+  },
+  {
+    id: "gesture-shortcut",
+    name: "���ƿ�ݿ���",
+    summary: "������Ļ�㼶�������л����ù��ܡ�",
+    capability: "�������",
+    tags: ["���", "����", "����"],
+    effects: { convenience: 2, style: 1, intelligence: 1 },
+    recommendedFor: ["���", "Ч��", "�ٵ㰴"],
+  },
+  {
+    id: "kid-zone",
+    name: "��ͯ�ػ�����",
+    summary: "���ݺ��ų�Ա״̬�����յ������Ѻ�����Ȩ�ޡ�",
+    capability: "��ͥ�ػ�",
+    tags: ["��ͥ", "����", "��ͯ"],
+    effects: { family: 2, comfort: 1, safety: 1 },
+    recommendedFor: ["��ͥ", "��ͯ", "���"],
+  },
+  {
+    id: "ambient-rhythm",
+    name: "�ɶ���Χ��",
+    summary: "�õƹ�������γɸ��������Ŀռ��",
+    capability: "Ӱ������",
+    tags: ["����", "����", "��Χ"],
+    effects: { style: 2, comfort: 1 },
+    recommendedFor: ["��Χ", "����", "���"],
+  },
+  {
+    id: "highway-navigate",
+    name: "�����캽����",
+    summary: "�ڳ�����·���зֵ�������������ٶȿ��ơ�",
+    capability: "������ȫ",
+    tags: ["��ȫ", "����", "��;"],
+    effects: { safety: 2, intelligence: 1, convenience: 1 },
+    recommendedFor: ["��;", "��ȫ", "ʡ��", "Ч��"],
+  },
+  {
+    id: "meeting-sync",
+    name: "�����ճ�����",
+    summary: "�����ճ��Զ��滮����ʱ���뵽�����ѡ�",
+    capability: "����Ч��",
+    tags: ["���", "����", "ͨ��"],
+    effects: { convenience: 2, intelligence: 1, comfort: 1 },
+    recommendedFor: ["ͨ��", "Ч��", "�г�"],
+  },
+  {
+    id: "karaoke",
+    name: "פ���跿",
+    summary: "�ڵȴ���¶Ӫʱ�����л�������״̬��",
+    capability: "Ӱ������",
+    tags: ["����", "����", "��Χ"],
+    effects: { style: 2, comfort: 1, family: 1 },
+    recommendedFor: ["����", "¶Ӫ", "��Χ"],
+  },
+  {
+    id: "fridge-box",
+    name: "����˫�ô�����",
+    summary: "�ó�;���кͼ�ͥ���������ݸ�˳�֡�",
+    capability: "��������",
+    tags: ["��ͥ", "����", "���"],
+    effects: { family: 1, comfort: 1, convenience: 1 },
+    recommendedFor: ["��ͥ", "��;", "����"],
+  },
+  {
+    id: "mood-presets",
+    name: "������ʻԤ��",
+    summary: "���ݼ�ʻ�龳�л���ͬ��������ƹ������ǿ�ȡ�",
+    capability: "��������",
+    tags: ["����", "����", "��Χ"],
+    effects: { style: 2, intelligence: 1, comfort: 1 },
+    recommendedFor: ["����", "��Χ", "��ʽ��"],
+  },
+  {
+    id: "rear-screen",
+    name: "������������",
+    summary: "�ó˿��ڵȴ��ͳ�;���и��������������顣",
+    capability: "Ӱ������",
+    tags: ["��ͥ", "����", "����"],
+    effects: { family: 1, comfort: 2, style: 1 },
+    recommendedFor: ["��ͥ", "����", "��;"],
+  },
+  {
+    id: "device-bridge",
+    name: "���豸�޷���ת",
+    summary: "�ֻ���ƽ���복��֮����������������νӡ�",
+    capability: "�豸����",
+    tags: ["���", "����", "��̬"],
+    effects: { convenience: 2, intelligence: 2 },
+    recommendedFor: ["��̬", "Ч��", "������"],
+  },
+  {
+    id: "appearance-kit",
+    name: "��������׼�",
+    summary: "�����������ӭ������ǿ���������Ա�",
+    capability: "�豸����",
+    tags: ["����", "���", "��ʽ��"],
+    effects: { style: 2, comfort: 1 },
+    recommendedFor: ["����", "���", "����"],
+  },
 ];
 
-export const libraryRows = [
-  { name: "智能泊车辅助", type: "功能卡", tags: "智能 / 便捷", enabled: true },
-  { name: "雨夜接人", type: "事件卡", tags: "安全 / 家庭", enabled: true },
-  { name: "重抽指令", type: "技能卡", tags: "操作", enabled: false },
-  { name: "座舱氛围律动", type: "功能卡", tags: "娱乐 / 个性", enabled: true },
+export const eventCards: EventCard[] = [
+  {
+    id: "rainy-pickup",
+    title: "��ҹ����",
+    description: "��·ʪ����������·�ߵ��㡣���ϣ�������Ȱ�����ס��ȫ�������ȼ������������",
+    planetName: "��һ������",
+    choices: [
+      {
+        id: "steady-first",
+        label: "����ס��ȫ",
+        description: "���ȸ�֪�����ѣ����Ҹ����ġ�",
+        recommendedTags: ["��ȫ", "��ҹ", "�ȶ�"],
+        recommendedCapabilities: ["������ȫ"],
+      },
+      {
+        id: "light-first",
+        label: "�ȼ������",
+        description: "�Ȱ��Ұѷ��������ֵ����",
+        recommendedTags: ["���", "ͣ��", "�ٲ���"],
+        recommendedCapabilities: ["��������", "�������"],
+      },
+    ],
+  },
+  {
+    id: "commute-rush",
+    title: "��߷�ͨ��",
+    description: "��������ǰ��ͨ��·�ϣ��������ʡʱ���Ч�ʣ����Ǿ������ִ���״̬��",
+    planetName: "�ڶ�������",
+    choices: [
+      {
+        id: "fast-commute",
+        label: "������Ч��",
+        description: "ϣ��ϵͳ����Ԥ��·�ߺ�ʱ�䡣",
+        recommendedTags: ["ͨ��", "Ч��", "ʡʱ"],
+        recommendedCapabilities: ["����Ч��", "�豸����"],
+      },
+      {
+        id: "calm-commute",
+        label: "�����Ӵ���",
+        description: "����һ�ϳ��ͱ���Ϣ��ը��",
+        recommendedTags: ["����", "����", "����"],
+        recommendedCapabilities: ["��������", "��������"],
+      },
+    ],
+  },
+  {
+    id: "family-trip",
+    title: "��ĩ��ͥ����",
+    description: "һ����һ�����ʱ����������չ˺��ų�Ա����������ȫ���������ɺ��棿",
+    planetName: "����������",
+    choices: [
+      {
+        id: "care-family",
+        label: "�����չ˼���",
+        description: "����С����״̬����Ҫ��",
+        recommendedTags: ["��ͥ", "��ͯ", "�չ�"],
+        recommendedCapabilities: ["��ͥ�ػ�", "��������"],
+      },
+      {
+        id: "fun-family",
+        label: "����Ӫ������",
+        description: "�ô�Ҷ���������·�̸���Ȥ��",
+        recommendedTags: ["����", "��Χ", "����"],
+        recommendedCapabilities: ["Ӱ������", "��������"],
+      },
+    ],
+  },
+  {
+    id: "tight-parking",
+    title: "�̳����³���",
+    description: "��λ��խ��ӵ�������ƫ���ͣ����ø����ɣ����ǰ��ܱ߷��տ��ø������",
+    planetName: "����������",
+    choices: [
+      {
+        id: "easy-park",
+        label: "���Ҹ�ʡ��",
+        description: "Խ���ظ�����Խ�á�",
+        recommendedTags: ["ͣ��", "���", "ʡ��"],
+        recommendedCapabilities: ["��������", "�������"],
+      },
+      {
+        id: "safe-park",
+        label: "���Ҹ�����",
+        description: "����Ҫ����ȷ���ܱ���ʾ��",
+        recommendedTags: ["��ȫ", "��Ұ", "����·��"],
+        recommendedCapabilities: ["������ȫ"],
+      },
+    ],
+  },
+  {
+    id: "late-night-drive",
+    title: "��ҹ��������",
+    description: "һ�������ؼҵ�·�ϣ������Ҫ���������������뱻һЩ��������������ס��",
+    planetName: "����������",
+    choices: [
+      {
+        id: "quiet-night",
+        label: "����һ�������ռ�",
+        description: "������ң��ó�����з�Χ��",
+        recommendedTags: ["����", "��Χ", "��ʽ��"],
+        recommendedCapabilities: ["��������", "Ӱ������"],
+      },
+      {
+        id: "smart-night",
+        label: "�������ҷֵ�",
+        description: "ϣ��ϵͳ�ܸ�������һ��Ҫ��ʲô��",
+        recommendedTags: ["����", "Ч��", "����"],
+        recommendedCapabilities: ["�������", "�豸����"],
+      },
+    ],
+  },
+  {
+    id: "camping-stop",
+    title: "¶Ӫ����",
+    description: "����Ӫ�غ��פ��ʱ�̣����ϣ������Ϊ���־ݵ㣬���ǳ�Ϊһ�����ʵ�����ռ䣿",
+    planetName: "����������",
+    choices: [
+      {
+        id: "camp-fun",
+        label: "�Ȱѷ�Χ����",
+        description: "���֡��ƹ��������������Ҫ��",
+        recommendedTags: ["����", "��Χ", "¶Ӫ"],
+        recommendedCapabilities: ["Ӱ������", "��������"],
+      },
+      {
+        id: "camp-comfort",
+        label: "�Ȱ��չ�����",
+        description: "��������Ϣ�����ʶȸ���Ҫ��",
+        recommendedTags: ["����", "��ͥ", "��;"],
+        recommendedCapabilities: ["��������", "��ͥ�ػ�"],
+      },
+    ],
+  },
+  {
+    id: "school-pickup",
+    title: "���޷�ѧ",
+    description: "�����ϳ�ǰ�����ϣ��ϵͳ���������©�������ó���Ѹ���л������ģʽ��",
+    planetName: "����������",
+    choices: [
+      {
+        id: "avoid-miss",
+        label: "�ȷ���©����",
+        description: "���Ѻ��ػ��ȱ�Ķ���Ҫ��",
+        recommendedTags: ["��ͥ", "��ȫ", "��ͯ"],
+        recommendedCapabilities: ["��ͥ�ػ�", "������ȫ"],
+      },
+      {
+        id: "companion-mode",
+        label: "�Ƚ������״̬",
+        description: "ϣ�����պͻ�������Ȼ��",
+        recommendedTags: ["��ͥ", "����", "���"],
+        recommendedCapabilities: ["Ӱ������", "��������"],
+      },
+    ],
+  },
+  {
+    id: "business-arrival",
+    title: "�ͻ����浽��ǰ",
+    description: "�ٽ�Ŀ�ĵ�ʱ�������Ҫ·����ʱ���������Ǹ����⳵�����ֳ����ʸк�״̬��",
+    planetName: "�ڰ�������",
+    choices: [
+      {
+        id: "arrive-on-time",
+        label: "�Ҹ��������",
+        description: "�������ڹؼ�ʱ���ҵ��",
+        recommendedTags: ["Ч��", "ͨ��", "�г�"],
+        recommendedCapabilities: ["����Ч��", "�豸����"],
+      },
+      {
+        id: "arrive-in-style",
+        label: "�Ҹ�����״̬",
+        description: "�ϳ���ĸ���Ҳ�������Լ���",
+        recommendedTags: ["����", "���", "��ʽ��"],
+        recommendedCapabilities: ["��������", "�豸����"],
+      },
+    ],
+  },
+  {
+    id: "holiday-highway",
+    title: "���ڳ�;����",
+    description: "��ʱ�����·������ϣ�������ʻ�����������չ�ȫ���˵�ƣ��״̬��",
+    planetName: "�ھ�������",
+    choices: [
+      {
+        id: "assist-drive",
+        label: "���ҷֵ���ʻ",
+        description: "Խ��Խʡ��Խ�á�",
+        recommendedTags: ["��;", "��ȫ", "ʡ��"],
+        recommendedCapabilities: ["������ȫ", "����Ч��"],
+      },
+      {
+        id: "care-everyone",
+        label: "�չ�ȫ������",
+        description: "������ˣ�·�̲Ų�����������",
+        recommendedTags: ["��ͥ", "����", "��;"],
+        recommendedCapabilities: ["��������", "��ͥ�ػ�"],
+      },
+    ],
+  },
+  {
+    id: "solo-showcase",
+    title: "���ѵ�һ������ĳ�",
+    description: "�������ѿ��ٸ��ܵ���̨��������ʱ�����ƫ��չʾ�Ƽ��У�����չʾ�ռ��Χ�У�",
+    planetName: "��ʮ������",
+    choices: [
+      {
+        id: "show-tech",
+        label: "չʾ�Ƽ�����",
+        description: "����һ�ϳ��;��ô�����",
+        recommendedTags: ["����", "����", "�Ƽ���"],
+        recommendedCapabilities: ["�������", "�豸����"],
+      },
+      {
+        id: "show-vibe",
+        label: "չʾ��Χ�ʸ�",
+        description: "����һ�ϳ��;���������з��",
+        recommendedTags: ["����", "��Χ", "����"],
+        recommendedCapabilities: ["Ӱ������", "��������"],
+      },
+    ],
+  },
 ];
+
+export const comboPacks: ComboPack[] = [
+  {
+    id: "safe-cocoon",
+    name: "�����캽��",
+    capability: "������ȫ",
+    items: ["������ҹ����", "ä��Ԥ����ǿ", "�����캽����"],
+    whyItFits: "�ʺ�ƫ���ȶ�����ȫ�к�ȷ���Եļ�ʻ�ߡ�",
+  },
+  {
+    id: "parking-saver",
+    name: "ʡ�Ĳ�����",
+    capability: "��������",
+    items: ["�Զ���������", "Զ���ٻ�", "��Ƶ·�߼���"],
+    whyItFits: "�ʺ�ϣ�������ظ�������ͣ�������ɵĳ�����",
+  },
+  {
+    id: "cozy-life",
+    name: "���������",
+    capability: "��������",
+    items: ["���ڿ�������", "��ѹ���ΰ�Ħ", "����˫�ô�����"],
+    whyItFits: "�ʺϰ��ճ����ʺ�ϸ���չ˷���ǰ����û���",
+  },
+  {
+    id: "family-orbit",
+    name: "��ͥ����",
+    capability: "��ͥ�ػ�",
+    items: ["��ͥ�ػ�����", "��ͯ�ػ�����", "�����ػ�ģʽ"],
+    whyItFits: "�ʺϸ�Ƶ��ͥ��������ų�Ա�������ȵ��û���",
+  },
+  {
+    id: "immersive-vibe",
+    name: "��Χ������",
+    capability: "Ӱ������",
+    items: ["����Ӱ��ģʽ", "�ɶ���Χ��", "פ���跿"],
+    whyItFits: "�ʺ���ѳ��ڿռ侭Ӫ�ø������������ָе��ˡ�",
+  },
+  {
+    id: "smart-flow",
+    name: "�ǻ���ת��",
+    capability: "�豸����",
+    items: ["���豸�޷���ת", "�����ճ�����", "��������׼�"],
+    whyItFits: "�ʺ���Ч�ʡ�������̬�����ұ��֮����ƽ�⡣",
+  },
+];
+
+export const minorPlanetTemplates: Omit<MinorPlanetChallenge, "slot">[] = [
+  {
+    id: "echo",
+    name: "������",
+    thresholds: [
+      { dimension: "safety", target: 58, reward: "��ȫʤ����" },
+      { dimension: "comfort", target: 58, reward: "����ʤ����" },
+    ],
+  },
+  {
+    id: "pulse",
+    name: "������",
+    thresholds: [
+      { dimension: "convenience", target: 60, reward: "���ʤ����" },
+      { dimension: "intelligence", target: 60, reward: "����ʤ����" },
+    ],
+  },
+  {
+    id: "harbor",
+    name: "������",
+    thresholds: [
+      { dimension: "family", target: 58, reward: "��ͥʤ����" },
+      { dimension: "comfort", target: 60, reward: "����ʤ����" },
+    ],
+  },
+  {
+    id: "flare",
+    name: "��β��",
+    thresholds: [
+      { dimension: "style", target: 58, reward: "����ʤ����" },
+      { dimension: "intelligence", target: 58, reward: "����ʤ����" },
+    ],
+  },
+];
+
+export const cardLibraryRows = [
+  ...featureCards.map((card) => ({
+    id: card.id,
+    name: card.name,
+    type: "���ܿ�",
+    tags: card.tags.join(" / "),
+    enabled: true,
+    detail: `${card.capability} �� ${card.summary}`,
+  })),
+  ...eventCards.map((card) => ({
+    id: card.id,
+    name: card.title,
+    type: "�¼���",
+    tags: card.choices.map((choice) => choice.label).join(" / "),
+    enabled: true,
+    detail: card.description,
+  })),
+  ...skillCards.map((card) => ({
+    id: card.id,
+    name: card.name,
+    type: "���ܿ�",
+    tags: "���� / �غϸ���",
+    enabled: true,
+    detail: card.summary,
+  })),
+];
+

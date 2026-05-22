@@ -1,253 +1,324 @@
-"use client";
+﻿"use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import homeBgm from "../../pub_pic/bgm.mp3";
+import homeLogo from "../../pub_pic/logo.png";
+import stageLeftImage from "../../pub_pic/page1_left.png";
+import stageRightImage from "../../pub_pic/page1_right.png";
+import stageNodeOne from "../../pub_pic/page1_star/1.png";
+import stageNodeTwo from "../../pub_pic/page1_star/2.png";
+import stageNodeThree from "../../pub_pic/page1_star/3.png";
+import stageNodeFour from "../../pub_pic/page1_star/4.png";
+import stageNodeFive from "../../pub_pic/page1_star/5.png";
+import type { GameRunState } from "../lib/game-types";
+import { useGame } from "./GameProvider";
 
-const journeyNodes = ["舒适星球", "安全星球", "连接星球", "效率星球", "探索星球", "1-3 个小星球", "最终驾驶星球"];
+const HOME_STAGE_NODES = [
+  { name: "������", variant: "cotton", imageSrc: stageNodeOne },
+  { name: "�ػ���", variant: "guard", imageSrc: stageNodeTwo },
+  { name: "������", variant: "shuttle", imageSrc: stageNodeThree },
+  { name: "Ѱ����", variant: "trace", imageSrc: stageNodeFour },
+  { name: "�ò���", variant: "chroma", imageSrc: stageNodeFive },
+];
 
-type BrowserIconProps = {
-  kind: "back" | "forward" | "refresh" | "lock" | "star" | "menu" | "report" | "cards" | "help" | "light";
-};
+const HOME_GUIDE_ITEMS = [
+  { title: "���ܿ�", text: "Ӱ�����������������άƫ�÷�������ÿ�غ���������ķ�����" },
+  { title: "�¼���", text: "�����Ǽ���;�еļ�ʻ�����������ڲ�ͬ�龳��������ѡ��" },
+  { title: "���ܿ�", text: "�ṩ�س顢���ơ����ƵȻغϸ��������������ǰ���ƽ��ࡣ" },
+];
 
-function BrowserIcon({ kind }: BrowserIconProps) {
-  if (kind === "back" || kind === "forward") {
-    return (
-      <svg aria-hidden="true" className="star-home-icon" viewBox="0 0 24 24">
-        <path d={kind === "back" ? "M15 5 8 12l7 7" : "m9 5 7 7-7 7"} />
-        <path d={kind === "back" ? "M9 12h11" : "M4 12h11"} />
-      </svg>
-    );
+const HOME_MEDIA_PLACEHOLDERS = [
+  { side: "left", label: "������Ӿ�ͼ", imageSrc: stageLeftImage },
+  { side: "right", label: "�Ҳ����Ӿ�ͼ", imageSrc: stageRightImage },
+];
+
+function getCurrentRunHref(currentRun: GameRunState) {
+  if (currentRun.stage === "challenge") {
+    return "/journey/challenge";
   }
 
-  const paths = {
-    refresh: ["M20 11a8 8 0 1 0-2.3 5.6", "M20 4v7h-7"],
-    lock: ["M7 11h10v9H7z", "M9 11V8a3 3 0 0 1 6 0v3"],
-    star: ["m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"],
-    menu: ["M12 5.5h.01", "M12 12h.01", "M12 18.5h.01"],
-    report: ["M6 3h9l3 3v15H6z", "M15 3v4h4", "M9 12h6", "M9 16h5"],
-    cards: ["M8 6 17 3l3 12-9 3z", "M4 8h10v13H4z"],
-    help: ["M12 17h.01", "M9.8 9a2.3 2.3 0 1 1 3.7 1.8c-.9.6-1.5 1.2-1.5 2.5"],
-    light: ["M12 3v3", "M5.6 5.6l2.1 2.1", "M3 12h3", "M18 12h3", "M16.3 7.7l2.1-2.1", "M8 17h8", "M9 21h6", "M9 14a4 4 0 1 1 6 0"],
-  };
+  if (currentRun.stage === "jump") {
+    return "/journey/jump";
+  }
 
+  if (currentRun.stage === "result") {
+    return "/result/reveal";
+  }
+
+  return "/journey/play";
+}
+
+function BrowserIcon({ children }: { children: ReactNode }) {
   return (
-    <svg aria-hidden="true" className="star-home-icon" viewBox="0 0 24 24">
-      {paths[kind].map((path) => (
-        <path d={path} key={path} />
-      ))}
+    <svg className="star-home-icon" viewBox="0 0 24 24" aria-hidden="true">
+      {children}
     </svg>
   );
 }
 
-function BrandMark() {
+function PageIcon() {
   return (
-    <svg aria-hidden="true" className="star-home-brand-mark" viewBox="0 0 96 72">
-      <ellipse cx="43" cy="42" rx="34" ry="14" transform="rotate(-16 43 42)" />
-      <circle cx="41" cy="36" r="20" />
-      <path d="M18 47c16 4 38 1 61-9" />
-      <path d="M30 24c4-4 10-7 17-7" />
-      <circle cx="33" cy="30" r="3" />
-      <circle cx="52" cy="41" r="4" />
-      <path d="M75 13v11M69 18h12" />
-      <path d="M82 25v7M78.5 28.5h7" />
+    <svg className="star-home-button-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 3h8l4 4v14H6Z" />
+      <path d="M14 3v5h5M9 12h6M9 16h6" />
     </svg>
   );
 }
 
-function Rocket() {
+function CardsIcon() {
   return (
-    <svg aria-hidden="true" className="star-home-rocket" viewBox="0 0 220 120">
-      <path d="M40 73c35-42 100-55 152-31-19 33-63 53-137 48z" />
-      <path d="M67 54 42 39l35-4" />
-      <path d="M74 90 58 111l38-17" />
-      <ellipse cx="139" cy="54" rx="23" ry="12" transform="rotate(-8 139 54)" />
-      <path d="M44 77c-14 6-24 11-35 21M51 89c-11 5-19 10-27 17M35 63c-14 2-24 5-32 9" />
-      <path d="M90 43c23-8 49-10 77-3" />
+    <svg className="star-home-button-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m7 4 11 3-3.5 13-11-3Z" />
+      <path d="m11 5 6-1 3 13-5 1" />
     </svg>
   );
 }
 
-function BigMoon() {
+function LightIcon() {
   return (
-    <svg aria-hidden="true" className="star-home-moon" viewBox="0 0 190 190">
-      <circle cx="95" cy="95" r="70" />
-      <path d="M46 118c24 23 64 28 97 7" />
-      <path d="M53 129c17 12 43 17 74 8" />
-      <circle cx="73" cy="78" r="9" />
-      <circle cx="109" cy="59" r="10" />
-      <circle cx="123" cy="105" r="14" />
-      <circle cx="70" cy="126" r="8" />
-      <path d="M95 15V3M95 187v-12M16 95H4M186 95h-12M39 39l-9-9M151 39l9-9M39 151l-9 9M151 151l9 9" />
-      <path d="M91 25V0h20" />
-      <path d="M111 0c12 4 19 8 27 3v26c-9 6-17 1-27-3z" />
+    <svg className="star-home-button-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M9 18h6M10 22h4M8 10a4 4 0 1 1 8 0c0 2-1.5 3-2.5 4.5H10.5C9.5 13 8 12 8 10Z" />
     </svg>
   );
 }
 
-function SmallPlanet({ className = "" }: { className?: string }) {
+function QuestionIcon() {
   return (
-    <svg aria-hidden="true" className={`star-home-small-planet ${className}`} viewBox="0 0 90 90">
-      <circle cx="45" cy="45" r="27" />
-      <path d="M17 51c19 8 42 7 64-7" />
-      <path d="M23 37c15 5 31 4 48-4" />
-      <circle cx="34" cy="31" r="4" />
-      <circle cx="55" cy="55" r="5" />
+    <svg className="star-home-guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9a2.7 2.7 0 0 1 5.1 1.2c0 2-2.2 2.2-2.2 4M12 18h.01" />
     </svg>
-  );
-}
-
-function Sparkles() {
-  return (
-    <>
-      <span className="star-home-sparkle sparkle-one" />
-      <span className="star-home-sparkle sparkle-two" />
-      <span className="star-home-sparkle sparkle-three" />
-      <span className="star-home-dot dot-one" />
-      <span className="star-home-dot dot-two" />
-      <span className="star-home-dot dot-three" />
-      <span className="star-home-dot dot-four" />
-    </>
   );
 }
 
 export function HomeExperience() {
-  const [musicOn, setMusicOn] = useState(true);
-  const [activeNode, setActiveNode] = useState(journeyNodes.length - 1);
+  const router = useRouter();
+  const {
+    state: { currentRun },
+    clearCurrentRun,
+  } = useGame();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [musicOn, setMusicOn] = useState(false);
+  const [showRunConfirm, setShowRunConfirm] = useState(false);
+
+  useEffect(() => {
+    const audio = new Audio(homeBgm);
+    audio.loop = true;
+    audio.preload = "auto";
+    audioRef.current = audio;
+
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+
+      if (audioRef.current === audio) {
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    if (!audio) {
+      return;
+    }
+
+    if (!musicOn) {
+      audio.pause();
+      audio.currentTime = 0;
+      return;
+    }
+
+    void audio.play().catch(() => {
+      setMusicOn(false);
+    });
+  }, [musicOn]);
+
+  function handlePrimaryClick() {
+    if (!currentRun) {
+      router.push("/journey/setup");
+      return;
+    }
+
+    setShowRunConfirm(true);
+  }
+
+  function handleClearAndRestart() {
+    clearCurrentRun();
+    setShowRunConfirm(false);
+    router.push("/journey/setup");
+  }
+
+  function handleContinueRun() {
+    if (!currentRun) {
+      setShowRunConfirm(false);
+      return;
+    }
+
+    setShowRunConfirm(false);
+    router.push(getCurrentRunHref(currentRun));
+  }
 
   return (
-    <main className="home-page star-home">
-      <section className="star-home-shell" aria-label="驾驶星球计划首页">
-        <header className="star-home-browser" aria-label="模拟浏览器导航栏">
+    <main className="star-home">
+      <section className="star-home-shell" aria-label="��ʻ����ƻ���ҳ">
+        <header className="star-home-browser" aria-label="ҳ������">
           <div className="star-home-window-dots" aria-hidden="true">
             <span />
             <span />
             <span />
           </div>
           <div className="star-home-browser-actions" aria-hidden="true">
-            <BrowserIcon kind="back" />
-            <BrowserIcon kind="forward" />
-            <BrowserIcon kind="refresh" />
+            <BrowserIcon>
+              <path d="m14 6-6 6 6 6" />
+            </BrowserIcon>
+            <BrowserIcon>
+              <path d="m10 6 6 6-6 6" />
+            </BrowserIcon>
+            <BrowserIcon>
+              <path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v6h-6" />
+            </BrowserIcon>
           </div>
-          <div className="star-home-address" aria-hidden="true">
-            <BrowserIcon kind="lock" />
+          <div className="star-home-address">
+            <BrowserIcon>
+              <rect x="6" y="10" width="12" height="9" rx="1.5" />
+              <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+            </BrowserIcon>
             <span>smart-cockpit-journey.com</span>
-            <BrowserIcon kind="star" />
+            <BrowserIcon>
+              <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6-5.4-2.9-5.4 2.9 1-6-4.4-4.3 6.1-.9Z" />
+            </BrowserIcon>
           </div>
           <div className="star-home-browser-end" aria-hidden="true">
-            <BrowserIcon kind="star" />
-            <BrowserIcon kind="menu" />
+            <BrowserIcon>
+              <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6-5.4-2.9-5.4 2.9 1-6-4.4-4.3 6.1-.9Z" />
+            </BrowserIcon>
+            <BrowserIcon>
+              <circle cx="12" cy="5" r="1" />
+              <circle cx="12" cy="12" r="1" />
+              <circle cx="12" cy="19" r="1" />
+            </BrowserIcon>
           </div>
         </header>
 
         <div className="star-home-canvas">
-          <nav className="star-home-topline" aria-label="首页控制">
+          <div className="star-home-topline">
             <div className="star-home-brand">
-              <BrandMark />
-              <span>驾驶星球计划</span>
+              <span className="star-home-logo-slot" aria-label="��ʻ����ƻ�Ʒ�� Logo">
+                <Image className="star-home-logo-image" src={homeLogo} alt="��ʻ����ƻ� Logo" priority />
+              </span>
+              <span>��ʻ����ƻ�</span>
             </div>
-            <button
-              aria-pressed={musicOn}
-              className="star-home-music"
-              onClick={() => setMusicOn((current) => !current)}
-              type="button"
-            >
-              音乐：{musicOn ? "开" : "关"}
+            <button className="star-home-music" type="button" aria-pressed={musicOn} onClick={() => setMusicOn((value) => !value)}>
+              ���֣�{musicOn ? "��" : "��"}
             </button>
-          </nav>
-
-          <div className="star-home-stage">
-            <Sparkles />
-            <svg aria-hidden="true" className="star-home-route route-left" viewBox="0 0 520 180">
-              <path d="M11 153C78 55 160 94 220 52c64-45 136-50 202-23 38 16 48 83 88 96" />
-              <circle cx="13" cy="153" r="9" />
-              <circle cx="509" cy="126" r="8" />
-            </svg>
-            <svg aria-hidden="true" className="star-home-route route-right" viewBox="0 0 580 220">
-              <path d="M8 168c80-7 91-74 134-98 53-31 130-5 178-28 45-22 82-56 143-27 65 31 65 100 105 128" />
-              <circle cx="9" cy="168" r="8" />
-              <circle cx="323" cy="42" r="8" />
-              <circle cx="567" cy="145" r="8" />
-            </svg>
-
-            <Rocket />
-            <SmallPlanet className="planet-a" />
-            <SmallPlanet className="planet-b" />
-            <SmallPlanet className="planet-c" />
-            <BigMoon />
-            <span className="star-home-final-label">最终驾驶星球</span>
-
-            <section className="star-home-copy">
-              <h1>
-                <span className="star-home-title-first">你的座舱，</span>
-                <span className="star-home-title-second">你的星球</span>
-              </h1>
-              <p>通过卡牌选择，构建你的智能座舱偏好，解锁专属旅途结局！</p>
-              <Link className="star-home-primary" href="/journey/setup">
-                <span>开始旅途</span>
-              </Link>
-              <div className="star-home-actions" aria-label="次要入口">
-                <Link className="star-home-secondary" href="/reports">
-                  <BrowserIcon kind="report" />
-                  <span>旅途报告</span>
-                </Link>
-                <Link className="star-home-secondary" href="/cards">
-                  <BrowserIcon kind="cards" />
-                  <span>浏览卡牌库</span>
-                </Link>
-              </div>
-            </section>
           </div>
 
-          <section className="star-home-journey" aria-label="你的星际旅途">
+          <section className="star-home-stage" aria-label="���Ӿ���">
+            {HOME_MEDIA_PLACEHOLDERS.map((item) => (
+              <div className={`star-home-media-slot ${item.side}`} key={item.side} aria-label={item.label}>
+                <Image className="star-home-media-asset" src={item.imageSrc} alt="" aria-hidden="true" priority={item.side === "left"} />
+              </div>
+            ))}
+
+            <div className="star-home-copy">
+              <h1>
+                <span>������գ����ѡ��</span>
+                <span className="star-home-title-final">��������Ǽ���;��</span>
+              </h1>
+              <p>ͨ������ѡ�񣬹��������������ƫ�ã�����ר����;��֣�</p>
+              <button className="star-home-primary" type="button" onClick={handlePrimaryClick}>
+                <span>��ʼ��;</span>
+              </button>
+              <div className="star-home-actions" aria-label="�����������">
+                <Link className="star-home-secondary" href="/reports">
+                  <PageIcon />
+                  <span>��;����</span>
+                </Link>
+                <Link className="star-home-secondary" href="/cards">
+                  <CardsIcon />
+                  <span>������ƿ�</span>
+                </Link>
+              </div>
+            </div>
+          </section>
+
+          <section className="star-home-journey" aria-label="����Ǽ���;">
             <div className="star-home-journey-title">
               <span />
-              <h2>你的星际旅途</h2>
+              <h2>����Ǽ���;</h2>
               <span />
             </div>
-            <div className="star-home-track" role="list">
-              {journeyNodes.map((node, index) => (
-                <button
-                  aria-label={`查看${node}`}
-                  className={`star-home-node ${activeNode === index ? "is-active" : ""} ${index === journeyNodes.length - 1 ? "is-final" : ""}`}
-                  key={node}
-                  onBlur={() => setActiveNode(journeyNodes.length - 1)}
-                  onFocus={() => setActiveNode(index)}
-                  onMouseEnter={() => setActiveNode(index)}
-                  type="button"
-                >
-                  <span className="star-home-node-orbit" aria-hidden="true">
-                    {index === 5 ? (
-                      <span className="star-home-mini-cluster">
-                        <i />
-                        <i />
-                        <i />
-                      </span>
-                    ) : index === 6 ? (
-                      <BigMoon />
-                    ) : (
-                      <SmallPlanet />
-                    )}
+            <div className="star-home-track">
+              {HOME_STAGE_NODES.map((node, index) => (
+                <div className={["star-home-node", "star-home-node--stage", index === 0 ? "is-active" : ""].filter(Boolean).join(" ")} key={node.name}>
+                  <span className={`star-home-node-image star-home-node-image--stage ${node.variant}`} aria-label={`${node.name}ͼƬ`}>
+                    <Image className="star-home-node-image-asset" src={node.imageSrc} alt="" aria-hidden="true" />
                   </span>
-                  <strong>{node}</strong>
-                  {index === 6 ? <small>解锁旅途结局</small> : null}
-                  {index === 5 ? <small>随机事件</small> : null}
-                </button>
+                  <strong>{node.name}</strong>
+                </div>
               ))}
+              <div className="star-home-node star-home-node--minor">
+                <span className="star-home-mini-cluster" aria-label="���С����ͼƬռλ">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+                <strong>1-3��С����</strong>
+                <small>�漴��ս</small>
+              </div>
+              <div className="star-home-node is-final">
+                <span className="star-home-node-image final" aria-label="���ռ�ʻ����ͼƬռλ" />
+                <strong>���ռ�ʻ����</strong>
+                <small>������;���</small>
+              </div>
             </div>
           </section>
         </div>
 
         <footer className="star-home-bottom">
           <span>
-            <BrowserIcon kind="light" />
-            在宇宙中，寻找你的星星！
+            <LightIcon />
+            �������У�Ѱ��������ǣ�
           </span>
-          <button className="star-home-guide" type="button">
-            新手指引
-            <BrowserIcon kind="help" />
-          </button>
+          <div className="star-home-guide-wrap">
+            <button className="star-home-guide" type="button" aria-describedby="star-home-guide-popover">
+              ����ָ��
+              <QuestionIcon />
+            </button>
+            <div className="star-home-guide-popover" id="star-home-guide-popover" role="tooltip">
+              {HOME_GUIDE_ITEMS.map((item) => (
+                <article key={item.title}>
+                  <strong>{item.title}</strong>
+                  <p>{item.text}</p>
+                </article>
+              ))}
+            </div>
+          </div>
         </footer>
+
+        {showRunConfirm ? (
+          <div className="star-home-confirm-backdrop" role="presentation">
+            <section className="star-home-confirm" role="dialog" aria-modal="true" aria-labelledby="star-home-confirm-title">
+              <h2 id="star-home-confirm-title">�Ƿ������ǰ�ó̽��ȣ�</h2>
+              <p>ȷ�Ϻ����µ��ó��趨��ʼ��ȡ������������ڽ��е��Ǽ���;��</p>
+              <div className="star-home-confirm-actions">
+                <button className="star-home-secondary" type="button" onClick={handleContinueRun}>
+                  ȡ����������ǰ����
+                </button>
+                <button className="star-home-primary star-home-primary--compact" type="button" onClick={handleClearAndRestart}>
+                  ȷ��������ؿ�
+                </button>
+              </div>
+            </section>
+          </div>
+        ) : null}
       </section>
     </main>
   );
 }
+

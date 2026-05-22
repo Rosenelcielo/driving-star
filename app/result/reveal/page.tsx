@@ -1,30 +1,53 @@
+﻿"use client";
+
+import { useEffect } from "react";
 import { ButtonLink } from "../../components/Button";
-import { Card } from "../../components/Card";
+import { HydrationGate, useLatestResultGuard } from "../../components/GameGuards";
+import { useGame } from "../../components/GameProvider";
 
 export default function ResultRevealPage() {
+  const latestResult = useLatestResultGuard();
+  const { state, clearCurrentRun } = useGame();
+
+  useEffect(() => {
+    if (state.currentRun?.stage === "result") {
+      clearCurrentRun();
+    }
+  }, [clearCurrentRun, state.currentRun]);
+
+  if (!latestResult) {
+    return null;
+  }
+
   return (
-    <main className="reveal-page">
-      <section className="reveal-stage">
-        <div className="driving-planet" aria-hidden="true" />
-        <div className="reveal-copy">
-          <p className="game-label">旅途结算</p>
-          <h1>你的驾驶星球已抵达</h1>
-          <h2>蓝弧驾驶星 · 智能效率型</h2>
-          <p>
-            你倾向于选择能让驾驶更稳定、更少打断、更主动分担操作的智能座舱。你的胜利星后缀是：安全、娱乐、智能。
-          </p>
+    <HydrationGate>
+      <main className="reveal-page">
+        <section className="reveal-stage">
+          <div className="driving-planet" aria-hidden="true" />
+          <div className="reveal-copy">
+            <p className="game-label">�ó̽���</p>
+            <h1>��ļ�ʻ�����Ѿ��ִ�</h1>
+            <h2>{latestResult.profile.title}</h2>
+            <p>{latestResult.profile.userView.summary}</p>
+            <p>
+              ���ռ�ʤ���ǣ�
+              {latestResult.earnedStars.length > 0 ? latestResult.earnedStars.join("��") : "������δ�ռ���ʤ����"}
+            </p>
+          </div>
+        </section>
+        <section className="game-card broadcast-card">
+          <strong>ϵͳ����</strong>
+          <p>{latestResult.profile.userView.comboLead}</p>
+        </section>
+        <div className="hero-actions">
+          <ButtonLink href="/result/insights">�����鿴�������</ButtonLink>
+          <ButtonLink href="/" variant="secondary">
+            ������ҳ
+          </ButtonLink>
         </div>
-      </section>
-      <Card as="section" className="broadcast-card">
-        <strong>系统播报</strong>
-        <p>建议优先关注高阶辅助驾驶、自动泊车联动、语音多轮交互与场景主动建议。</p>
-      </Card>
-      <div className="hero-actions">
-        <ButtonLink href="/result/insights">继续查看完整结果</ButtonLink>
-        <ButtonLink href="/" variant="secondary">
-          返回首页
-        </ButtonLink>
-      </div>
-    </main>
+      </main>
+    </HydrationGate>
   );
 }
+
+
