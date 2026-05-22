@@ -1,9 +1,11 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
+import { ClickSparkles } from "./components/ClickSparkles";
+import { GameProvider } from "./components/GameProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "智能座舱卡牌测试小游戏",
-  description: "一场星际旅途感的智能座舱偏好测试小游戏。",
+  title: "Driver Star 驾乘星球计划",
+  description: "一个把智能座舱偏好测试做成可玩旅程的在线小游戏。",
 };
 
 export default function RootLayout({
@@ -13,7 +15,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body>{children}</body>
+      <body>
+        <GameProvider>
+          {children}
+          <ClickSparkles />
+        </GameProvider>
+      </body>
     </html>
   );
 }
+
