@@ -81,13 +81,13 @@ export default function ResultInsightsPage() {
       <main className="app-page">
         <header className="page-header">
           <div>
-            <p className="game-label">�������</p>
-            <h1>ͬһ���ọ́����ֽ���ӽ�</h1>
+            <p className="game-label">完整结果</p>
+            <h1>同一趟旅程，两种解读视角</h1>
           </div>
-          <div className="view-switch" role="group" aria-label="����ӽ�">
+          <div className="view-switch" role="group" aria-label="结果视角">
             {(["user", "sales"] as const).map((view) => (
               <button className={resultView === view ? "is-selected" : ""} key={view} onClick={() => setResultView(view)} type="button">
-                {view === "user" ? "�û��ӽ�" : "�����ӽ�"}
+                {view === "user" ? "用户视角" : "销售视角"}
               </button>
             ))}
           </div>
@@ -95,20 +95,20 @@ export default function ResultInsightsPage() {
 
         <section className="insights-grid">
           <Card as="section" className="result-summary">
-            <p className="game-label">�ܽ���</p>
+            <p className="game-label">总结结果</p>
             <h2>{copy.title}</h2>
             <p>{copy.summary}</p>
             <p className="result-pill">
-              ���˸�{latestResult.profile.primaryLabel} / ���˸�{latestResult.profile.secondaryLabel}
+              主人格：{latestResult.profile.primaryLabel} / 副人格：{latestResult.profile.secondaryLabel}
             </p>
             <p className="hint">
-              AI ����״̬��
-              {latestResult.aiNarrative ? "�Ѳ�ȫ AI ������" : aiStatus === "error" ? "��ǰʹ�ù������" : "���ڳ���������ǿ�İ���"}
+              AI 报告状态：
+              {latestResult.aiNarrative ? "已补全 AI 版叙述" : aiStatus === "error" ? "当前使用规则版结果" : "正在尝试生成增强文案…"}
             </p>
           </Card>
 
           <Card as="section" className="dimension-panel">
-            <p className="game-label">��ά����</p>
+            <p className="game-label">六维画像</p>
             <div className="dimension-list">
               {dimensionMeta.map((dimension) => (
                 <ProgressBar key={dimension.key} label={dimension.label} value={latestResult.dimensions[dimension.key]} />
@@ -117,7 +117,7 @@ export default function ResultInsightsPage() {
           </Card>
 
           <Card as="section" className="combo-panel">
-            <p className="game-label">�������</p>
+            <p className="game-label">功能组合</p>
             <h2>{copy.comboLead}</h2>
             <div className="combo-list">
               {latestResult.comboPacks.map((pack) => (
@@ -131,17 +131,17 @@ export default function ResultInsightsPage() {
           </Card>
 
           <Card as="section" className="replay-panel">
-            <p className="game-label">�ó̻ط�</p>
+            <p className="game-label">旅程回放</p>
             <ol>
               {latestResult.journeyLog.map((step) => (
                 <li key={`${step.step}-${step.cardId}`}>
                   <strong>
-                    {step.planetName} �� {step.eventTitle}
+                    {step.planetName} · {step.eventTitle}
                   </strong>
                   <span>
-                    ��ѡ���ˡ�{step.choiceLabel}���������{step.cardName}��
-                    {step.duplicateApplied ? "��Ч��������" : ""}
-                    {step.gainedStars.length > 0 ? `������� ${step.gainedStars.join("��")}` : "��"}
+                    你选择了“{step.choiceLabel}”，打出“{step.cardName}”
+                    {step.duplicateApplied ? "（效果翻倍）" : ""}
+                    {step.gainedStars.length > 0 ? `，并获得 ${step.gainedStars.join("、")}。` : "。"}
                   </span>
                 </li>
               ))}
@@ -149,24 +149,23 @@ export default function ResultInsightsPage() {
           </Card>
 
           <Card as="section" className="advice-panel">
-            <p className="game-label">���콨��</p>
+            <p className="game-label">延伸建议</p>
             <h2>{copy.advice}</h2>
             {aiCopy ? <p>{aiCopy}</p> : null}
-            {!aiCopy && aiStatus === "error" ? <p>AI �İ���ʱ�����ã���ǰҳ�����Զ����˵���������ݡ�</p> : null}
+            {!aiCopy && aiStatus === "error" ? <p>AI 文案暂时不可用，当前页面已自动回退到规则版内容。</p> : null}
           </Card>
         </section>
 
         <div className="page-actions">
           <ButtonLink href="/cards" variant="secondary">
-            ������ƿ�
+            浏览卡牌库
           </ButtonLink>
           <ButtonLink href="/reports" variant="secondary">
-            �鿴���浵��
+            查看报告档案
           </ButtonLink>
-          <ButtonLink href="/">�ص���ҳ</ButtonLink>
+          <ButtonLink href="/">回到首页</ButtonLink>
         </div>
       </main>
     </HydrationGate>
   );
 }
-

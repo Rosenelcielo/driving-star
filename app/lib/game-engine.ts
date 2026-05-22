@@ -14,14 +14,12 @@ import {
   type ComboPack,
   type DimensionKey,
   type DimensionScores,
-  type EventCard,
   type EventChoice,
   type FeatureCard,
   type FinalResult,
   type GameConfig,
   type GameRunState,
   type JourneyLogEntry,
-  type MinorPlanetChallenge,
   type PlanetTheme,
   type ResultProfile,
   type SkillCard,
@@ -54,7 +52,7 @@ const primaryProfiles: Record<
   convenience: {
     label: "便捷顺滑型",
     title: "讨厌重复操作，偏爱顺手体验",
-    summary: "你最看重的是省步骤、省时间和低心智负担，任何能让流程更丝滑的功能都更容易打动你。",
+    summary: "你最看重的是省步骤、省时间和低心智负担，能让流程更丝滑的功能更容易打动你。",
     comboLead: "你真正需要的不是更多功能，而是更少阻力的流程组合。",
     advice: "适合强调泊车效率、路线记忆和设备流转顺畅度的配置方向。",
     sales: "用户对节省操作和流畅衔接高度敏感，推荐时应突出效率收益和学习成本低。",
@@ -63,29 +61,29 @@ const primaryProfiles: Record<
     label: "舒适沉浸型",
     title: "空间感受优先，旅程要松弛",
     summary: "你会把车看成生活延伸，能否让人放松、安静、舒服，往往比参数更重要。",
-    comboLead: "适合你的组合会先营造舒服的空间，再慢慢补充科技能力。",
+    comboLead: "适合你的组合会先营造舒适的空间，再慢慢补充科技能力。",
     advice: "适合关注座椅、空气、静音和情绪场景联动的舒适型路线。",
     sales: "用户对空间体感和长时间乘坐舒适度更敏感，推荐应围绕身心放松与氛围稳定展开。",
   },
   family: {
     label: "家庭关怀型",
-    title: "只要家人舒服，这趟路就值了",
+    title: "只要家人舒服，这趟路就值得了",
     summary: "你会自然把注意力放在家人、后排乘客与陪伴质量上，偏好能主动照顾人的座舱能力。",
-    comboLead: "你的理想组合，更像一个会陪伴会照顾人的座舱搭档。",
+    comboLead: "你的理想组合，更像一个会陪伴、会照顾人的座舱搭档。",
     advice: "适合重点关注儿童守护、后排体验与细节照顾的家庭取向配置。",
-    sales: "用户在家庭出行和后排体验上的权重明显更高，推荐沟通可从陪伴与守护切入。",
+    sales: "用户在家庭出行和后排体验上的权重明显更高，推荐沟通可以从陪伴与守护切入。",
   },
   style: {
     label: "个性表达型",
     title: "功能之外，也想让车替你表达",
-    summary: "你在意的不只是能不能用，还在意好不好看、有没有情绪和是否能代表自己的风格。",
+    summary: "你在意的不只是能不能用，还在意好不好看、有没有情绪，以及是否能代表自己的风格。",
     comboLead: "适合你的方案会把氛围、主题和个性化控制一起做完整。",
     advice: "适合关注主题外观、灯光联动和内容氛围感更强的产品方向。",
     sales: "用户在表达感、设计感和情绪价值上更活跃，推荐应强调差异化体验而非纯参数。",
   },
   intelligence: {
     label: "智能效率型",
-    title: "希望系统主动接住你下一步",
+    title: "希望系统主动接住你的下一步",
     summary: "你期待的是更懂场景、更会分担的座舱体验，不只是会响应，而是会预判。",
     comboLead: "最能打动你的，是主动建议、跨设备协作和可连续执行的智能能力。",
     advice: "适合关注语音交互、场景预测和生态联动更完整的车型方案。",
@@ -111,7 +109,7 @@ export function getFeatureById(id: string): FeatureCard {
   return featureCards.find((card) => card.id === id) ?? featureCards[0];
 }
 
-export function getEventById(id: string): EventCard {
+export function getEventById(id: string) {
   return eventCards.find((card) => card.id === id) ?? eventCards[0];
 }
 
@@ -153,13 +151,7 @@ function pickRecommendedCards(choice: EventChoice) {
   });
 }
 
-export function buildFeatureCandidates(
-  eventId: string,
-  choiceId: string,
-  excludedIds: string[],
-  seedSource: string,
-  count = HAND_SIZE,
-) {
+export function buildFeatureCandidates(eventId: string, choiceId: string, excludedIds: string[], seedSource: string, count = HAND_SIZE) {
   const event = getEventById(eventId);
   const choice = event.choices.find((item) => item.id === choiceId) ?? event.choices[0];
   const recommended = seededShuffle(
@@ -266,17 +258,6 @@ export function openCandidatePool(run: GameRunState, source: CandidateSource): G
     ...run,
     currentCandidates: pool,
     candidateSource: source,
-  };
-}
-
-export function addCandidateToHand(run: GameRunState, cardId: string): GameRunState {
-  const nextHand = Array.from(new Set([cardId, ...run.hand])).slice(0, HAND_SIZE + 1);
-  return {
-    ...run,
-    hand: nextHand,
-    selectedFeatureId: cardId,
-    currentCandidates: [],
-    candidateSource: null,
   };
 }
 
@@ -479,24 +460,25 @@ function buildResultProfile(run: GameRunState): ResultProfile {
   const primary = primaryProfiles[topDimensions[0]];
   const secondaryLabel = getSecondaryLabel(run.journeyLog);
   const comboPackIds = pickComboPacks(run.journeyLog).map((pack) => pack.id);
+  const planet = getPlanetById(run.config.planetId);
 
   return {
     primaryLabel: primary.label,
     secondaryLabel,
-    title: `${getPlanetById(run.config.planetId).name} · ${primary.label}`,
+    title: `${planet.name} · ${primary.label}`,
     topDimensions,
     comboPackIds,
     userView: {
       title: primary.title,
       summary: primary.summary,
       comboLead: primary.comboLead,
-      advice: `${primary.advice} 你的出生星球建议色是 ${getPlanetById(run.config.planetId).colorAdvice}。`,
+      advice: `${primary.advice} 你的出生星球建议色是 ${planet.colorAdvice}。`,
     },
     salesView: {
       title: `${primary.label}用户画像`,
       summary: primary.sales,
       comboLead: "推荐优先从最能减负和建立感知价值的能力组合切入。",
-      advice: `导购表达可结合 ${getPlanetById(run.config.planetId).title} 的气质包装，强化用户的审美认同。`,
+      advice: `导购表达可结合“${planet.title}”的气质包装，强化用户的审美认同。`,
     },
   };
 }
@@ -548,4 +530,3 @@ export function getHistoryPreview(result: FinalResult) {
     stars: result.earnedStars,
   };
 }
-

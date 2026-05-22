@@ -11,7 +11,7 @@ import { useCardDrafts } from "../components/useCardDrafts";
 import { cardLibraryRows } from "../data/game";
 import type { CardDraftStore, EditableCardDraft } from "../lib/card-drafts";
 
-const ALL_TYPES = "ȫ������";
+const ALL_TYPES = "全部类型";
 
 export default function CardsPage() {
   const router = useRouter();
@@ -66,7 +66,7 @@ export default function CardsPage() {
   const activeCard = filteredRows.find((row) => row.id === selectedCard) ?? filteredRows[0] ?? null;
 
   function handleDelete(cardId: string, cardName: string) {
-    const confirmed = window.confirm(`ȷ��Ҫɾ����${cardName}����ɾ��������ӵ�ǰ���ƿ���ͼ�����ء�`);
+    const confirmed = window.confirm(`确定要删除“${cardName}”吗？删除后它会从当前卡牌库视图中隐藏。`);
     if (!confirmed) {
       return;
     }
@@ -101,7 +101,7 @@ export default function CardsPage() {
     link.download = `driver-star-card-backup-${Date.now()}.json`;
     link.click();
     URL.revokeObjectURL(url);
-    setBackupStatus("��������ѵ���");
+    setBackupStatus("备份牌库已导出");
   }
 
   function handleImportClick() {
@@ -122,15 +122,15 @@ export default function CardsPage() {
         const nextDrafts = extractDraftStore(parsed);
 
         replaceDrafts(nextDrafts ?? {});
-        setBackupStatus("��������ѵ���");
+        setBackupStatus("备份牌库已导入");
       } catch {
-        setBackupStatus("����ʧ�ܣ���ȷ�ϱ����ļ���ʽ��ȷ");
+        setBackupStatus("导入失败，请确认备份文件格式正确");
       } finally {
         event.target.value = "";
       }
     };
     reader.onerror = () => {
-      setBackupStatus("����ʧ�ܣ�������ѡ���ļ�");
+      setBackupStatus("导入失败，请重新选择文件");
       event.target.value = "";
     };
     reader.readAsText(file);
@@ -153,17 +153,17 @@ export default function CardsPage() {
       <header className="page-header">
         <div>
           <p className="game-label">Card Library</p>
-          <h1>���ƿ�</h1>
+          <h1>卡牌库</h1>
         </div>
         <div className="page-actions">
           <ButtonLink className="header-action" href="/" variant="secondary">
-            �ص���ҳ
+            回到首页
           </ButtonLink>
           <Button className="header-action" onClick={handleExportBackup} variant="secondary">
-            ��������
+            导出牌组
           </Button>
           <Button className="header-action" onClick={handleImportClick}>
-            ��������
+            导入牌组
           </Button>
           <input ref={fileInputRef} accept="application/json" className="sr-only" onChange={handleImportBackup} type="file" />
         </div>
@@ -173,37 +173,37 @@ export default function CardsPage() {
       <section className="library-layout">
         <Card as="section" className="library-main">
           <div className="filters">
-            <input placeholder="�����������ơ���ǩ��˵��" type="search" value={query} onChange={(event) => setQuery(event.target.value)} />
-            <select aria-label="��������" value={type} onChange={(event) => setType(event.target.value)}>
+            <input placeholder="搜索卡牌名称、标签或说明" type="search" value={query} onChange={(event) => setQuery(event.target.value)} />
+            <select aria-label="卡牌类型" value={type} onChange={(event) => setType(event.target.value)}>
               <option>{ALL_TYPES}</option>
-              <option>���ܿ�</option>
-              <option>�¼���</option>
-              <option>���ܿ�</option>
+              <option>功能卡</option>
+              <option>事件卡</option>
+              <option>技能卡</option>
             </select>
-            <select aria-label="����״̬">
-              <option>ȫ��״̬</option>
-              <option>����</option>
+            <select aria-label="卡牌状态">
+              <option>全部状态</option>
+              <option>启用</option>
             </select>
             <Button className="filters__create" onClick={handleCreateCard}>
-              ��ӿ���
+              添加卡牌
             </Button>
           </div>
           <div className="card-table">
             {filteredRows.map((row) => (
               <div className={`table-row ${selectedCard === row.id ? "is-selected" : ""}`} key={row.id}>
                 <button className="table-row__main" onClick={() => setSelectedCard(row.id)} type="button">
-                  <span>��</span>
+                  <span>◆</span>
                   <strong>{row.name}</strong>
                   <em>{row.type}</em>
                   <small>{row.tags}</small>
-                  <b>{row.enabled ? "����" : "ͣ��"}</b>
+                  <b>{row.enabled ? "启用" : "停用"}</b>
                 </button>
                 <div className="table-row__actions">
                   <Link className="table-row__link" href={`/cards/editor?id=${row.id}`}>
-                    �༭
+                    编辑
                   </Link>
                   <button className="table-row__link is-danger" onClick={() => handleDelete(row.id, row.name)} type="button">
-                    ɾ��
+                    删除
                   </button>
                 </div>
               </div>
@@ -214,22 +214,22 @@ export default function CardsPage() {
         <Card as="aside" className="detail-drawer">
           {activeCard ? (
             <>
-              <p className="game-label">��������</p>
+              <p className="game-label">卡牌详情</p>
               <div className="feature-card static-card detail-preview-card">
                 <strong>{activeCard.name}</strong>
                 <span>{activeCard.type}</span>
-                <CardArtwork alt={`${activeCard.name} ����ͼ��`} src={activeCard.artwork} />
+                <CardArtwork alt={`${activeCard.name} 卡牌图面`} src={activeCard.artwork} />
                 <p className="detail-preview-card__description">{activeCard.detail}</p>
               </div>
               <dl>
-                <dt>״̬</dt>
-                <dd>{activeCard.enabled ? "������" : "δ����"}</dd>
+                <dt>状态</dt>
+                <dd>{activeCard.enabled ? "启用中" : "未启用"}</dd>
               </dl>
             </>
           ) : (
             <>
-              <p className="game-label">��������</p>
-              <p>��ǰû�п���ʾ�Ŀ��ơ������ͨ���Ϸ�����ӿ��ơ���ť����һ�ſ���</p>
+              <p className="game-label">空状态</p>
+              <p>当前没有可显示的卡牌。你可以通过上方“添加卡牌”按钮新增一张卡。</p>
             </>
           )}
         </Card>
@@ -237,4 +237,3 @@ export default function CardsPage() {
     </main>
   );
 }
-

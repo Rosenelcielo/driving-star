@@ -36,13 +36,13 @@ export function normalizeCapabilityCategory(value: string) {
     return value;
   }
 
-  if (value.includes("语音") || value.includes("交互")) {
+  if (value.includes("语音") || value.includes("交互") || value.includes("泊车")) {
     return "语音与交互";
   }
   if (value.includes("影音") || value.includes("娱乐")) {
     return "影音娱乐与内容体验";
   }
-  if (value.includes("舒适") || value.includes("氛围") || value.includes("健康")) {
+  if (value.includes("舒适") || value.includes("氛围") || value.includes("健康") || value.includes("场景")) {
     return "座舱氛围与舒适体验";
   }
   if (value.includes("家庭") || value.includes("关怀") || value.includes("儿童") || value.includes("宠物")) {

@@ -70,7 +70,7 @@ export default function JourneyPlayPage() {
         <main className="app-page">
           <section className="game-card empty-state-card">
             <p className="game-label">Journey</p>
-            <h1>���ڻָ��ó̡�</h1>
+            <h1>正在恢复旅程…</h1>
           </section>
         </main>
       </HydrationGate>
@@ -115,14 +115,14 @@ export default function JourneyPlayPage() {
           </div>
           <div className="stage-status">
             <strong>
-              ������ {Math.min(run.currentMainIndex + 1, run.eventDeck.length)} / {run.eventDeck.length}
+              主星球 {Math.min(run.currentMainIndex + 1, run.eventDeck.length)} / {run.eventDeck.length}
             </strong>
-            <span>��������{planet.name}</span>
-            <span>���ռ�ʤ���ǣ�{run.earnedStars.length} ��</span>
+            <span>出生星球：{planet.name}</span>
+            <span>已收集胜利星：{run.earnedStars.length} 颗</span>
           </div>
         </header>
 
-        <section className="journey-stage" aria-label="�ó�����̨">
+        <section className="journey-stage" aria-label="旅程主舞台">
           <div className="stage-map">
             {run.eventDeck.map((eventId, index) => (
               <span className={`stage-dot ${index < run.currentMainIndex ? "passed" : ""} ${index === run.currentMainIndex ? "current" : ""}`} key={eventId} />
@@ -131,7 +131,7 @@ export default function JourneyPlayPage() {
           <span className="drawn-ship stage-ship" />
           <Card as="article" className="event-card">
             <p className="game-label">
-              {planet.name} �� {event.planetName}
+              {planet.name} · {event.planetName}
             </p>
             <h1>
               <span>{event.title}</span>
@@ -154,8 +154,8 @@ export default function JourneyPlayPage() {
         </section>
 
         <footer className="action-layer">
-          <section className="skill-zone" aria-label="���ܿ���">
-            <span className="zone-title">���ܿ�</span>
+          <section className="skill-zone" aria-label="技能卡区">
+            <span className="zone-title">技能卡</span>
             {skillCards.map((skill) => {
               const usedCount = run.skillUses[skill.id];
               const disabled = usedCount >= skill.maxUses;
@@ -163,13 +163,13 @@ export default function JourneyPlayPage() {
                 <button className="skill-card" disabled={disabled} key={skill.id} onClick={() => handleSkill(skill.id)} type="button" title={skill.summary}>
                   <strong>{skill.name}</strong>
                   <small>{skill.summary}</small>
-                  <small>{disabled ? "��������" : `ʣ�� ${skill.maxUses - usedCount} ��`}</small>
+                  <small>{disabled ? "本局已用" : `剩余 ${skill.maxUses - usedCount} 次`}</small>
                 </button>
               );
             })}
           </section>
 
-          <section className="hand-zone" aria-label="��ǰ������">
+          <section className="hand-zone" aria-label="当前手牌区">
             {handCards.map((card) => {
               const displayCard = getDisplayCard(card);
               return (
@@ -181,14 +181,14 @@ export default function JourneyPlayPage() {
                   onClick={() => selectFeature(card.id)}
                   type="button"
                 >
-                  <CardArtwork alt={`${displayCard.name} ����ͼ��`} src={displayCard.artwork} />
+                  <CardArtwork alt={`${displayCard.name} 卡牌图面`} src={displayCard.artwork} />
                   <span>{displayCard.capability}</span>
                   <strong>{displayCard.name}</strong>
                   <small>{displayCard.summary}</small>
                   <small>
                     {Object.entries(displayCard.effects)
                       .map(([key, value]) => `${dimensionLabelMap[key as keyof typeof dimensionLabelMap]} ${value! > 0 ? "+" : ""}${value}`)
-                      .join(" �� ")}
+                      .join(" · ")}
                   </small>
                 </button>
               );
@@ -199,20 +199,20 @@ export default function JourneyPlayPage() {
             <Button
               onClick={() => {
                 if (run.manualDrawUsed) {
-                  setToast("���غ��Ѿ������������ˡ�");
+                  setToast("本回合已经主动补过牌了。");
                   return;
                 }
                 openCandidates("manual-draw");
               }}
               variant="secondary"
             >
-              {run.manualDrawUsed ? "���غ��Ѳ���" : "��������"}
+              {run.manualDrawUsed ? "本回合已补牌" : "主动补牌"}
             </Button>
             <span>
-              ��ѡ����{selectedChoice.label} / ��ѡ���ܿ���{selectedFeature.name}
-              {run.duplicateCardId === run.selectedFeatureId ? " / ���غ�Ч������" : ""}
+              已选方向：{selectedChoice.label} / 已选功能卡：{selectedFeature.name}
+              {run.duplicateCardId === run.selectedFeatureId ? " / 本回合效果翻倍" : ""}
             </span>
-            <Button onClick={handleConfirmPlay}>ȷ�ϳ���</Button>
+            <Button onClick={handleConfirmPlay}>确认出牌</Button>
           </div>
         </footer>
 
@@ -221,19 +221,19 @@ export default function JourneyPlayPage() {
           className={`modal-backdrop ${candidateCards.length > 0 ? "is-open" : ""}`}
           onClick={(eventTarget) => {
             if (eventTarget.target === eventTarget.currentTarget) {
-              setToast("��ѡ��һ�ź�ѡ���������ơ�");
+              setToast("请选择一张候选卡加入手牌。");
             }
           }}
         >
           <section aria-labelledby="draw-title" aria-modal="true" className="draw-modal" role="dialog">
-            <h2 id="draw-title">{run.candidateSource === "skill-draw" ? "���ܲ��ƣ�ѡ�� 1 �ż�������" : "�������ƣ�ѡ�� 1 �ż�������"}</h2>
-            <p>��Щ��ѡ��������㱾�غϵĿ��÷�����ѡ�����Զ���Ϊ��ǰ��ѡ���ܿ���</p>
+            <h2 id="draw-title">{run.candidateSource === "skill-draw" ? "技能补牌：选择 1 张加入手牌" : "主动补牌：选择 1 张加入手牌"}</h2>
+            <p>这些候选卡会加入你本回合的可用方案，选择后会自动成为当前已选功能卡。</p>
             <div className="candidate-row">
               {candidateCards.map((card) => {
                 const displayCard = getDisplayCard(card);
                 return (
                   <button className="feature-card" key={card.id} onClick={() => pickCandidate(card.id)} type="button">
-                    <CardArtwork alt={`${displayCard.name} ����ͼ��`} src={displayCard.artwork} />
+                    <CardArtwork alt={`${displayCard.name} 卡牌图面`} src={displayCard.artwork} />
                     <span>{displayCard.capability}</span>
                     <strong>{displayCard.name}</strong>
                     <small>{displayCard.summary}</small>
@@ -245,10 +245,9 @@ export default function JourneyPlayPage() {
         </div>
 
         <div aria-live="polite" className={`skill-toast ${toast ? "is-visible" : ""}`}>
-          {toast || "�����ɹ�"}
+          {toast || "操作成功"}
         </div>
       </main>
     </HydrationGate>
   );
 }
-

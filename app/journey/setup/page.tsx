@@ -18,11 +18,11 @@ import { planets } from "../../data/game";
 const MINOR_COUNT_OPTIONS = [0, 1, 2];
 
 const SETUP_MINOR_NODES = [
-  { name: "������", imageSrc: stageNodeOne },
-  { name: "�ػ���", imageSrc: stageNodeTwo },
-  { name: "������", imageSrc: stageNodeThree },
-  { name: "Ѱ����", imageSrc: stageNodeFour },
-  { name: "�ò���", imageSrc: stageNodeFive },
+  { name: "棉云星", imageSrc: stageNodeOne },
+  { name: "守护星", imageSrc: stageNodeTwo },
+  { name: "飞梭星", imageSrc: stageNodeThree },
+  { name: "寻踪星", imageSrc: stageNodeFour },
+  { name: "幻彩星", imageSrc: stageNodeFive },
 ];
 
 function BrowserIcon({ children }: { children: ReactNode }) {
@@ -112,9 +112,9 @@ export default function JourneySetupPage() {
   const routeSummary = useMemo(
     () =>
       slots
-        .map((selected, index) => (selected ? `������ ${index + 1} ��` : ""))
+        .map((selected, index) => (selected ? `主星球 ${index + 1} 后` : ""))
         .filter(Boolean)
-        .join("��"),
+        .join("、"),
     [slots],
   );
 
@@ -137,8 +137,8 @@ export default function JourneySetupPage() {
   return (
     <HydrationGate>
       <main className="journey-setup-page">
-        <section className="journey-setup-shell" aria-label="�ó��趨">
-          <header className="journey-setup-browser" aria-label="ҳ������">
+        <section className="journey-setup-shell" aria-label="旅程设定">
+          <header className="journey-setup-browser" aria-label="浏览器外框">
             <div className="journey-setup-window-dots" aria-hidden="true">
               <span />
               <span />
@@ -180,21 +180,21 @@ export default function JourneySetupPage() {
           <div className="journey-setup-canvas">
             <div className="journey-setup-topline">
               <div className="journey-setup-brand">
-                <span className="journey-setup-logo-slot" aria-label="��ʻ����ƻ�Ʒ�� Logo">
-                  <Image className="journey-setup-logo-image" src={homeLogo} alt="��ʻ����ƻ� Logo" priority />
+                <span className="journey-setup-logo-slot" aria-label="驾驶星球计划 Logo">
+                  <Image className="journey-setup-logo-image" src={homeLogo} alt="驾驶星球计划 Logo" priority />
                 </span>
-                <span>��ʻ����ƻ�</span>
+                <span>驾驶星球计划</span>
               </div>
               <button className="journey-setup-music" type="button" aria-pressed={musicOn} onClick={() => setMusicOn((value) => !value)}>
-                ���֣�{musicOn ? "��" : "��"}
+                音乐：{musicOn ? "开" : "关"}
               </button>
             </div>
 
             <div className="journey-setup-hero">
               <div className="journey-setup-reserve" aria-hidden="true" />
               <div className="journey-setup-title-card">
-                <h1>�趨�����;</h1>
-                <p>ѡ����ĳ�����������;���࣬�滮һ��ר��������Ǽ��ó̡�</p>
+                <h1>设定你的旅途</h1>
+                <p>选择你的出生星球与旅途节奏，规划一段专属于你的星际旅程。</p>
               </div>
               <div className="journey-setup-reserve" aria-hidden="true" />
             </div>
@@ -204,7 +204,7 @@ export default function JourneySetupPage() {
                 <section className="journey-setup-panel journey-setup-panel--planets" aria-labelledby="setup-planets-title">
                   <div className="journey-setup-step-heading">
                     <span>1</span>
-                    <h2 id="setup-planets-title">ѡ���������</h2>
+                    <h2 id="setup-planets-title">选择出生星球</h2>
                   </div>
                   <div className="planet-options journey-setup-planet-options">
                     {planets.map((planet) => (
@@ -215,7 +215,7 @@ export default function JourneySetupPage() {
                         type="button"
                       >
                         <div className="planet-option-media">
-                          <Image alt={`${planet.name}����ͼʾ`} className="planet-option-image" fill sizes="92px" src={planet.imageSrc} />
+                          <Image alt={`${planet.name}星球图示`} className="planet-option-image" fill sizes="92px" src={planet.imageSrc} />
                         </div>
                         <strong>{planet.name}</strong>
                         <small>{planet.description}</small>
@@ -228,9 +228,9 @@ export default function JourneySetupPage() {
                 <section className="journey-setup-panel" aria-labelledby="setup-count-title">
                   <div className="journey-setup-step-heading">
                     <span>2</span>
-                    <h2 id="setup-count-title">ѡ��С��������</h2>
+                    <h2 id="setup-count-title">选择小星球数量</h2>
                   </div>
-                  <div className="journey-setup-count-control" role="group" aria-label="С��������">
+                  <div className="journey-setup-count-control" role="group" aria-label="小星球数量">
                     {MINOR_COUNT_OPTIONS.map((count) => (
                       <button
                         className={minorCount === count ? "is-selected" : ""}
@@ -238,7 +238,7 @@ export default function JourneySetupPage() {
                         onClick={() => updateMinorCount(count)}
                         type="button"
                       >
-                        <strong>{count} ��</strong>
+                        <strong>{count} 颗</strong>
                       </button>
                     ))}
                   </div>
@@ -247,9 +247,9 @@ export default function JourneySetupPage() {
                 <section className="journey-setup-panel" aria-labelledby="setup-slots-title">
                   <div className="journey-setup-step-heading">
                     <span>3</span>
-                    <h2 id="setup-slots-title">����С�������λ��</h2>
+                    <h2 id="setup-slots-title">设置小星球插入位置</h2>
                   </div>
-                  <div className="journey-setup-route" aria-label="С�������λ��">
+                  <div className="journey-setup-route" aria-label="小星球插入位置">
                     {SETUP_MINOR_NODES.map((node, index) => {
                       const slotIndex = index - 1;
                       const isSlot = index > 0;
@@ -263,7 +263,7 @@ export default function JourneySetupPage() {
                               disabled={minorCount === 0 && !isSelectedSlot}
                               onClick={() => toggleSlot(slotIndex)}
                               type="button"
-                              aria-label={`�ڵ� ${slotIndex + 1} ������������С����`}
+                              aria-label={`在第 ${slotIndex + 1} 个主星球后插入小星球`}
                             >
                               {isSelectedSlot ? <MinorPlanetIcon /> : <span aria-hidden="true">+</span>}
                             </button>
@@ -276,24 +276,24 @@ export default function JourneySetupPage() {
                       );
                     })}
                   </div>
-                  <p className="journey-setup-route-hint">������߿򣬿��ڸ�λ�ò���С����</p>
+                  <p className="journey-setup-route-hint">点击虚线框，可在该位置插入小星球。</p>
                 </section>
               </div>
 
-              <aside className="journey-setup-info" aria-label="��;�趨˵��">
-                <h2>��;�趨˵��</h2>
+              <aside className="journey-setup-info" aria-label="旅途设定说明">
+                <h2>旅途设定说明</h2>
                 <article>
-                  <h3>���������Ӱ��</h3>
-                  <p>��������Ӿ������뱨����ɫ���</p>
+                  <h3>出生星球的影响</h3>
+                  <p>决定你的视觉主题与报告配色。</p>
                 </article>
                 <article>
-                  <h3>С�����Ӱ��</h3>
-                  <p>Ӱ����;���ܳ�������ս�¼��ܶȡ�</p>
+                  <h3>小星球的影响</h3>
+                  <p>影响旅途总长度与挑战事件密度。</p>
                 </article>
                 <div className="journey-setup-ready">
-                  <strong>�趨��ɺ󼴿����</strong>
-                  <span>��ǰѡ��{minorCount} ��С����</span>
-                  <span>����λ�ã�{routeSummary || "��δѡ��"}</span>
+                  <strong>设定完成后即可启航</strong>
+                  <span>当前选择：{minorCount} 颗小星球</span>
+                  <span>插入位置：{routeSummary || "暂未选择"}</span>
                 </div>
               </aside>
             </div>
@@ -305,9 +305,9 @@ export default function JourneySetupPage() {
 
             <footer className="journey-setup-actions">
               <ButtonLink href="/" variant="secondary">
-                ������ҳ
+                返回首页
               </ButtonLink>
-              <Button onClick={startJourney}>��ʼ�����;</Button>
+              <Button onClick={startJourney}>开始这段旅途</Button>
             </footer>
           </div>
         </section>
@@ -315,4 +315,3 @@ export default function JourneySetupPage() {
     </HydrationGate>
   );
 }
-

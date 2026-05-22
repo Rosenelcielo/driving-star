@@ -33,10 +33,10 @@ export default function JumpPage() {
           <span />
         </div>
         <div className="jump-orb target" aria-hidden="true" />
-        <h1>����ԾǨ����һ��������</h1>
+        <h1>正在跃迁到下一个主星球</h1>
         <p>
-          ��һ�غ��Ѽ�¼���ó���־��
-          {run.lastResolvedTurn ? `���� ${run.lastResolvedTurn.planetName} ѡ���ˡ�${run.lastResolvedTurn.choiceLabel}���������${run.lastResolvedTurn.cardName}����` : "�غϽ����ͬ����"}
+          上一回合已记录进旅程日志，
+          {run.lastResolvedTurn ? `你在 ${run.lastResolvedTurn.planetName} 选择了“${run.lastResolvedTurn.choiceLabel}”，打出“${run.lastResolvedTurn.cardName}”。` : "回合结果已同步。"}
         </p>
         <div className="hero-actions">
           <button
@@ -47,13 +47,12 @@ export default function JumpPage() {
             }}
             type="button"
           >
-            ������һ�ڵ�
+            进入下一节点
           </button>
-          <ButtonLink href="/reports">�ȿ���ǰ����</ButtonLink>
+          <ButtonLink href="/reports">先看当前档案</ButtonLink>
         </div>
       </main>
     </HydrationGate>
   );
 }
-
 

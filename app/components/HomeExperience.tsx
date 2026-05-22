@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -17,22 +17,22 @@ import type { GameRunState } from "../lib/game-types";
 import { useGame } from "./GameProvider";
 
 const HOME_STAGE_NODES = [
-  { name: "������", variant: "cotton", imageSrc: stageNodeOne },
-  { name: "�ػ���", variant: "guard", imageSrc: stageNodeTwo },
-  { name: "������", variant: "shuttle", imageSrc: stageNodeThree },
-  { name: "Ѱ����", variant: "trace", imageSrc: stageNodeFour },
-  { name: "�ò���", variant: "chroma", imageSrc: stageNodeFive },
+  { name: "棉云星", variant: "cotton", imageSrc: stageNodeOne },
+  { name: "守护星", variant: "guard", imageSrc: stageNodeTwo },
+  { name: "飞梭星", variant: "shuttle", imageSrc: stageNodeThree },
+  { name: "寻踪星", variant: "trace", imageSrc: stageNodeFour },
+  { name: "幻彩星", variant: "chroma", imageSrc: stageNodeFive },
 ];
 
 const HOME_GUIDE_ITEMS = [
-  { title: "���ܿ�", text: "Ӱ�����������������άƫ�÷�������ÿ�غ���������ķ�����" },
-  { title: "�¼���", text: "�����Ǽ���;�еļ�ʻ�����������ڲ�ͬ�龳��������ѡ��" },
-  { title: "���ܿ�", text: "�ṩ�س顢���ơ����ƵȻغϸ��������������ǰ���ƽ��ࡣ" },
+  { title: "功能卡", text: "影响座舱能力组合与六维偏好分数，是每回合真正打出的方案。" },
+  { title: "事件卡", text: "呈现星际旅途中的驾驶场景，让你在不同情境里做方向选择。" },
+  { title: "技能卡", text: "提供重抽、补牌、换牌等回合辅助，帮你调整当前手牌节奏。" },
 ];
 
 const HOME_MEDIA_PLACEHOLDERS = [
-  { side: "left", label: "������Ӿ�ͼ", imageSrc: stageLeftImage },
-  { side: "right", label: "�Ҳ����Ӿ�ͼ", imageSrc: stageRightImage },
+  { side: "left", label: "左侧主视觉图", imageSrc: stageLeftImage },
+  { side: "right", label: "右侧主视觉图", imageSrc: stageRightImage },
 ];
 
 function getCurrentRunHref(currentRun: GameRunState) {
@@ -165,8 +165,8 @@ export function HomeExperience() {
 
   return (
     <main className="star-home">
-      <section className="star-home-shell" aria-label="��ʻ����ƻ���ҳ">
-        <header className="star-home-browser" aria-label="ҳ������">
+      <section className="star-home-shell" aria-label="驾驶星球计划首页">
+        <header className="star-home-browser" aria-label="浏览器外框">
           <div className="star-home-window-dots" aria-hidden="true">
             <span />
             <span />
@@ -208,17 +208,17 @@ export function HomeExperience() {
         <div className="star-home-canvas">
           <div className="star-home-topline">
             <div className="star-home-brand">
-              <span className="star-home-logo-slot" aria-label="��ʻ����ƻ�Ʒ�� Logo">
-                <Image className="star-home-logo-image" src={homeLogo} alt="��ʻ����ƻ� Logo" priority />
+              <span className="star-home-logo-slot" aria-label="驾驶星球计划 Logo">
+                <Image className="star-home-logo-image" src={homeLogo} alt="驾驶星球计划 Logo" priority />
               </span>
-              <span>��ʻ����ƻ�</span>
+              <span>驾驶星球计划</span>
             </div>
             <button className="star-home-music" type="button" aria-pressed={musicOn} onClick={() => setMusicOn((value) => !value)}>
-              ���֣�{musicOn ? "��" : "��"}
+              音乐：{musicOn ? "开" : "关"}
             </button>
           </div>
 
-          <section className="star-home-stage" aria-label="���Ӿ���">
+          <section className="star-home-stage" aria-label="首页主视觉">
             {HOME_MEDIA_PLACEHOLDERS.map((item) => (
               <div className={`star-home-media-slot ${item.side}`} key={item.side} aria-label={item.label}>
                 <Image className="star-home-media-asset" src={item.imageSrc} alt="" aria-hidden="true" priority={item.side === "left"} />
@@ -227,54 +227,54 @@ export function HomeExperience() {
 
             <div className="star-home-copy">
               <h1>
-                <span>������գ����ѡ��</span>
-                <span className="star-home-title-final">��������Ǽ���;��</span>
+                <span>你的座舱，你的选择，</span>
+                <span className="star-home-title-final">决定你的星际旅途。</span>
               </h1>
-              <p>ͨ������ѡ�񣬹��������������ƫ�ã�����ר����;��֣�</p>
+              <p>通过卡牌选择，构建你的智能座舱偏好，解锁专属旅途结局。</p>
               <button className="star-home-primary" type="button" onClick={handlePrimaryClick}>
-                <span>��ʼ��;</span>
+                <span>开始旅途</span>
               </button>
-              <div className="star-home-actions" aria-label="�����������">
+              <div className="star-home-actions" aria-label="首页快捷入口">
                 <Link className="star-home-secondary" href="/reports">
                   <PageIcon />
-                  <span>��;����</span>
+                  <span>旅途报告</span>
                 </Link>
                 <Link className="star-home-secondary" href="/cards">
                   <CardsIcon />
-                  <span>������ƿ�</span>
+                  <span>浏览卡牌库</span>
                 </Link>
               </div>
             </div>
           </section>
 
-          <section className="star-home-journey" aria-label="����Ǽ���;">
+          <section className="star-home-journey" aria-label="星际旅途路线">
             <div className="star-home-journey-title">
               <span />
-              <h2>����Ǽ���;</h2>
+              <h2>你的星际旅途</h2>
               <span />
             </div>
             <div className="star-home-track">
               {HOME_STAGE_NODES.map((node, index) => (
                 <div className={["star-home-node", "star-home-node--stage", index === 0 ? "is-active" : ""].filter(Boolean).join(" ")} key={node.name}>
-                  <span className={`star-home-node-image star-home-node-image--stage ${node.variant}`} aria-label={`${node.name}ͼƬ`}>
+                  <span className={`star-home-node-image star-home-node-image--stage ${node.variant}`} aria-label={`${node.name}图片`}>
                     <Image className="star-home-node-image-asset" src={node.imageSrc} alt="" aria-hidden="true" />
                   </span>
                   <strong>{node.name}</strong>
                 </div>
               ))}
               <div className="star-home-node star-home-node--minor">
-                <span className="star-home-mini-cluster" aria-label="���С����ͼƬռλ">
+                <span className="star-home-mini-cluster" aria-label="可选小星球">
                   <i />
                   <i />
                   <i />
                 </span>
-                <strong>1-3��С����</strong>
-                <small>�漴��ս</small>
+                <strong>1-3 个小星球</strong>
+                <small>随机挑战</small>
               </div>
               <div className="star-home-node is-final">
-                <span className="star-home-node-image final" aria-label="���ռ�ʻ����ͼƬռλ" />
-                <strong>���ռ�ʻ����</strong>
-                <small>������;���</small>
+                <span className="star-home-node-image final" aria-label="最终驾驶星球" />
+                <strong>最终驾驶星球</strong>
+                <small>解锁旅途结局</small>
               </div>
             </div>
           </section>
@@ -283,11 +283,11 @@ export function HomeExperience() {
         <footer className="star-home-bottom">
           <span>
             <LightIcon />
-            �������У�Ѱ��������ǣ�
+            在宇宙中，寻找你的星星！
           </span>
           <div className="star-home-guide-wrap">
             <button className="star-home-guide" type="button" aria-describedby="star-home-guide-popover">
-              ����ָ��
+              新手指引
               <QuestionIcon />
             </button>
             <div className="star-home-guide-popover" id="star-home-guide-popover" role="tooltip">
@@ -304,14 +304,14 @@ export function HomeExperience() {
         {showRunConfirm ? (
           <div className="star-home-confirm-backdrop" role="presentation">
             <section className="star-home-confirm" role="dialog" aria-modal="true" aria-labelledby="star-home-confirm-title">
-              <h2 id="star-home-confirm-title">�Ƿ������ǰ�ó̽��ȣ�</h2>
-              <p>ȷ�Ϻ����µ��ó��趨��ʼ��ȡ������������ڽ��е��Ǽ���;��</p>
+              <h2 id="star-home-confirm-title">是否清除当前旅程进度？</h2>
+              <p>确认后会从新的旅程设定开始；取消会继续你正在进行的星际旅途。</p>
               <div className="star-home-confirm-actions">
                 <button className="star-home-secondary" type="button" onClick={handleContinueRun}>
-                  ȡ����������ǰ����
+                  取消，继续当前进度
                 </button>
                 <button className="star-home-primary star-home-primary--compact" type="button" onClick={handleClearAndRestart}>
-                  ȷ��������ؿ�
+                  确认清除并重开
                 </button>
               </div>
             </section>
@@ -321,4 +321,3 @@ export function HomeExperience() {
     </main>
   );
 }
-

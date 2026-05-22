@@ -270,26 +270,26 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       useSkill: (skillId) => {
         const run = state.currentRun;
         if (!run) {
-          return { ok: false, message: "��ǰû�н����е��ó̡�" };
+          return { ok: false, message: "当前没有正在进行的旅程" };
         }
         const used = run.skillUses[skillId];
         const maxUses = getSkillById(skillId).maxUses;
         if (used >= maxUses) {
-          return { ok: false, message: "���ż����Ʊ����Ѿ��ù��ˡ�" };
+          return { ok: false, message: "这个技能本局已经用完了" };
         }
         dispatch({ type: "use-skill", skillId });
-        return { ok: true, message: "���ܷ����ɹ���" };
+        return { ok: true, message: "技能已生效" };
       },
       resolvePlay: () => {
         const run = state.currentRun;
         if (!run) {
-          return { ok: false, message: "��ǰû�пɽ���Ļغϡ�" };
+          return { ok: false, message: "当前没有正在进行的旅程" };
         }
         if (!run.selectedChoiceId || !run.selectedFeatureId) {
-          return { ok: false, message: "������ɷ���͹��ܿ�ѡ��" };
+          return { ok: false, message: "请先选择方向和功能卡" };
         }
         dispatch({ type: "resolve-play" });
-        return { ok: true, message: "���غ��ѽ��㡣" };
+        return { ok: true, message: "本回合已记录" };
       },
       resolveMinorPlanet: () => dispatch({ type: "resolve-minor-planet" }),
       continueJourney: () => dispatch({ type: "continue-journey" }),
@@ -309,4 +309,3 @@ export function useGame() {
   }
   return context;
 }
-
